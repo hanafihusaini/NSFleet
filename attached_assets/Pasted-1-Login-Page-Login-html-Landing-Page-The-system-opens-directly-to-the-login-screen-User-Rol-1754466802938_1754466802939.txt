@@ -1,0 +1,210 @@
+1. Login Page (Login.html)
+•	Landing Page: The system opens directly to the login screen.
+•	User Roles: Three roles — Admin, User and Super Admin
+•	Security Features:
+o	Maximum of 3 login attempts.
+o	Lockout period of 5 minutes after 3 failed attempts.
+o	Display error messages on failed attempts.
+•	Post-Login Navigation:
+o	User: Redirected to Booking Page (Book.html).
+o	Admin: Redirected to Application Page 
+o	Super Admin: Redirected to Application Page
+
+________________________________________
+2. Booking Page (Book.html)
+•	Users must fill in the following fields:
+o	Applicant Name (Free Text) – Required
+o	Applicant Unit (Free Text) – Required
+o	Departure Date (Calendar) – Required
+o	Departure Time (Time picker) – Required
+o	Return Date (Calendar) – Required
+o	Return Time (Time picker)– Required
+o	Passenger Name (Free Text) – Optional
+o	Destination (Free Text) – Required
+o	Purpose (Free Text) – Required
+o	Notes - no. of pax, officer’s phone, etc. (Free Text, max 50 characters) – Optional
+•	Booking ID Format: Auto-generated as: 2-digit year + 3-digit running number (e.g. 25001).
+•	Notifications: Email notifications will be sent to user for each successful booking.
+•	Audit Trail: Submission date is recorded and labelled as "Application Submission Date".
+•	Booking Validation: Only future date/time booking is allowed. 
+•	Navigations:	
+o	Once booking submitted, return to booking page. 
+o	Bottom page button: Submit, Check Booking Status, View Calendar and Log off
+________________________________________
+3. User Quick Access (from Booking Page)
+•	User can:
+o	Check Booking Status: Button📋 Booking Status
+	By listing all their past applications, showing status: Approved, Rejected or Pending
+	Each request displays: Booking ID, Departure Date/time, Return Date/time, Destination, Purpose, Booking Status and Application Submission Date. As for Approved booking, show Driver Name.
+	Filtering options on top 
+	Status label: Approved – Green, Rejected – Red and Pending – Yellow.
+o	View Booking Calendar: Button 🗓️ Calendar
+	A calendar showing all approved and pending bookings. 
+	Booking item in calendar labelled as follows:
+	Item label: Vehicle Number + Applicant Name + Departure and Return Time
+	Item colour: Approved – Green and Pending – Yellow.
+	User can view only
+•	Navigations: Bottom page button: Return to Booking Page and Log off
+
+
+________________________________________4. Applications Page
+•	Lists all applications (Pending, Approved and Rejected). Pending booking always on top. Other booking sorting by Booking ID.
+•	Scrollable list with 10 entries per page.
+•	Search & Filter (top of table): by Status, Applicant Name, Travel Date, Destination or Purpose.
+•	Each request displays:
+o	Booking ID
+o	Departure Date/time
+o	Return Date/time 
+o	Destination
+o	Purpose
+o	Booking Status (colour: Pending = Yellow, Approved = Green, Rejected = Red)
+o	“Application Submission Date”
+o	“Processing Time”
+	Formula for Pending Booking – Working day count between Application Submission Date and Today
+	Formula for Approved/Rejected Booking – Working day count between Application Submission Date and Application Processed Date/Application Modified Date (whichever is latest). 
+	For each working day count more than 3, font colour is Red.
+o	Booking details (Once click, a pop up screen to list all booking and process details like driver name, vehicle number and instruction to driver). View only with back button available. 
+o	Admin Actions button. (Once click, a pop up screen for Admin to process booking)
+	Admin Actions for Pending Booking
+	Approve (Approved), Reject (Rejected).
+	Only Admin or Super Admin is allowed
+	When approving, Admin or Super Admin must input:
+	Driver Name (Dropdown): – Required
+	Mohd Kasah
+	Mohd Fadzil
+	Abd Rashid
+	Farid
+	Vehicle Number (Dropdown): – Required
+	Fortuner - WQQ 4798
+	Xtrail - VJU 8649
+	Aruz - VLK 3534
+	Instruction to Driver (Dropdown): – Required
+	“Driver Must Wait”
+	“Driver Need Not Wait”
+	Application Process Validation: 
+	System checks for clashes with existing approved bookings.
+	Overlapping bookings are not allowed. No driver’s name and vehicle number are overlapping the same booking period. 
+	A pop up error message to notify 
+	Audit Trail: The date Admin processes the request is recorded and labelled as "Application Processed Date". All changes are timestamped and recorded for audit trail.
+	Admin Actions for Approved/Rejected Booking
+	Display existing details with the option to modify
+	Booking Status
+	Driver Name
+	Vehicle Number
+	Instruction to Driver
+	Only Super Admin is allowed to modify booking
+	Audit Trail: The date Admin processes the request is recorded and labelled as "Application Modified Date". All changes are timestamped and recorded for audit trail.
+	Application Process Validation: 
+	System checks for clashes with existing approved bookings.
+	Overlapping bookings are not allowed. No driver’s name and vehicle number are overlapping the same booking period. 
+	A pop up error message to notify 
+	Notifications: Email notifications will be sent to user and admin for each successful/rejected booking.
+	Navigations: 
+	Once submitted, return to previous page. (Application Page or calendar page)
+	Bottom page button: Return to previous page and Log off
+
+________________________________________
+5. Admin Quick Access (from Application Page)
+•	Admin can:
+o	View Interactive Calendar Page: 🗓️ Calendar
+o	Access to Reports Page: Button 📊 Reports
+________________________________________
+
+________________________________________
+6. Interactive Calendar Page
+•	A calendar showing all approved and pending bookings. 
+•	Design:
+o	Full calendar view (Month view)
+o	Events show:
+	Vehicle Number (Header)
+	Booking ID
+	Applicant Name 
+	Departure Date/time and Return Date/Time. 
+	Destination & Driver info
+	Color by status: Approved – Green and Pending – Yellow.
+o	Public holidays marked (Blue)
+o	Click to open full detail popup
+•	Additional info: Public Holidays for Malaysia (Federal and Negeri Sembilan) (colour – Blue)
+•	Once click on the Booking item, a pop up screen to show all details as below:
+o	Booking ID
+o	Departure Date/time
+o	Return Date/time 
+o	Destination
+o	Purpose
+o	Booking Status (colour: Pending = Yellow, Approved = Green, Rejected = Red)
+o	“Application Submission Date”
+o	“Processing Time”
+	Formula for Pending Booking – Working day count between Application Submission Date and Today
+	Formula for Approved/Rejected Booking – Working day count between Application Submission Date and Application Processed Date/Application Modified Date (whichever is latest). 
+	For each working day count more than 3, font colour is Red.
+o	Booking details (Once click, a pop up screen to list all booking and process details like driver name, vehicle number and instruction to driver). View only with back button available. 
+o	Admin Actions button. (Once click, a pop up screen for Admin to process booking)
+	Admin Actions for Pending Booking
+	Approve (Approved), Reject (Rejected).
+	Only Admin or Super Admin is allowed
+	When approving, Admin or Super Admin must input:
+	Driver Name (Dropdown): – Required
+	Mohd Kasah
+	Mohd Fadzil
+	Abd Rashid
+	Farid
+	Vehicle Number (Dropdown): – Required
+	Fortuner - WQQ 4798
+	Xtrail - VJU 8649
+	Aruz - VLK 3534
+	Instruction to Driver (Dropdown): – Required
+	“Driver Must Wait”
+	“Driver Need Not Wait”
+	Application Process Validation: 
+	System checks for clashes with existing approved bookings.
+	Overlapping bookings are not allowed. No driver’s name and vehicle number are overlapping the same booking period. 
+	A pop up error message to notify 
+	Audit Trail: The date Admin processes the request is recorded and labelled as "Application Processed Date". All changes are timestamped and recorded for audit trail.
+	Admin Actions for Approved/Rejected Booking
+	Display existing details with the option to modify
+	Booking Status
+	Driver Name
+	Vehicle Number
+	Instruction to Driver
+	Only Super Admin is allowed to modify booking
+	Audit Trail: The date Admin processes the request is recorded and labelled as "Application Modified Date". All changes are timestamped and recorded for audit trail.
+	Application Process Validation: 
+	System checks for clashes with existing approved bookings.
+	Overlapping bookings are not allowed. No driver’s name and vehicle number are overlapping the same booking period. 
+	A pop up error message to notify 
+	Notifications: Email notifications will be sent to user and admin for each successful/rejected booking.
+	Navigations: 
+	Once submitted, return to previous page. (Application Page or calendar page)
+	Bottom page button: Return to previous page and Log off
+________________________________________
+7. Reports Page 
+•	First Section on top
+o	A dashboard showing statistical data
+•	Second Section after
+o	A list of reports: (available and downloadable in pdf and xls)
+	Booking Processing Performance Report
+	Shows the number of working days taken to process for each Approved application. 
+	Categories:
+	≤ 3 working days
+	3 working days
+	Booking Summary Report
+	Shows all details by list
+	Filter options to customize data output by Booking ID, Status, Applicant Name, Unit, Departure/Return Dates & Times, Destination, Purpose, Submission Date, Process/Modified Date, Driver Name, Vehicle Number
+	JANM-MyP/UPK/KEND/12/B01 Form
+	Uses a specific template (Ref No: JANM-MyP/UPK/KEND/12/B01)
+	Auto-filled with:
+	Applicant Name
+	Unit
+	Departure/Return Dates & Times
+	Passengers
+	Destination
+	Purpose
+	Notes
+	Submission Date
+	Processed/Modified Date (whichever is latest)
+	Driver Name
+	Vehicle Number
+	Driver Instruction
+________________________________________
+8. Navigation
+•	Every page (except Login) includes Back and Logout functions for ease of navigation.
