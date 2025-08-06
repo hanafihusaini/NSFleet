@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { FileText, User, Calendar, MapPin, Target, StickyNote, Clock, Printer } from "lucide-react";
+import { FileText, User as UserIcon, Calendar, MapPin, Target, StickyNote, Clock, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BookingModalProps {
@@ -73,7 +73,7 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <User className="h-4 w-4" />
+                <UserIcon className="h-4 w-4" />
                 Maklumat Permohonan
               </h4>
               <div className="space-y-3">

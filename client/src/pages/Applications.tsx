@@ -25,7 +25,7 @@ export default function Applications() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showProcessModal, setShowProcessModal] = useState(false);
   const [filters, setFilters] = useState({
-    status: '',
+    status: 'all',
     applicantName: '',
     departureDate: '',
     destination: '',
@@ -40,7 +40,7 @@ export default function Applications() {
     queryFn: async () => {
       const params = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, value);
+        if (value && value !== 'all') params.append(key, value);
       });
       params.append('limit', itemsPerPage.toString());
       params.append('offset', ((currentPage - 1) * itemsPerPage).toString());
@@ -126,7 +126,7 @@ export default function Applications() {
                     <SelectValue placeholder="Semua Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Semua Status</SelectItem>
+                    <SelectItem value="all">Semua Status</SelectItem>
                     <SelectItem value="pending">Tertunda</SelectItem>
                     <SelectItem value="approved">Diluluskan</SelectItem>
                     <SelectItem value="rejected">Ditolak</SelectItem>

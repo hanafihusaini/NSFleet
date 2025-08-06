@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import type { User } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Calendar, Clock, User, MapPin, FileText } from "lucide-react";
+import { Calendar, Clock, User as UserIcon, MapPin, FileText } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { z } from "zod";
 
@@ -38,7 +39,7 @@ export default function BookingForm() {
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      applicantName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+      applicantName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '',
       applicantUnit: user?.unit || '',
       passengerName: '',
       destination: '',
@@ -125,7 +126,7 @@ export default function BookingForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                      <User className="h-4 w-4" />
+                      <UserIcon className="h-4 w-4" />
                       Maklumat Pemohon
                     </h3>
                     

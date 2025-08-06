@@ -15,7 +15,7 @@ export default function BookingStatus() {
   const [, setLocation] = useLocation();
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const { data: userBookings, isLoading } = useQuery({
     queryKey: ['/api/bookings'],
@@ -47,7 +47,7 @@ export default function BookingStatus() {
   };
 
   const filteredBookings = userBookings?.filter((booking: any) => 
-    !statusFilter || booking.status === statusFilter
+    !statusFilter || statusFilter === 'all' || booking.status === statusFilter
   ) || [];
 
   return (
@@ -67,7 +67,7 @@ export default function BookingStatus() {
                     <SelectValue placeholder="Semua Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Semua Status</SelectItem>
+                    <SelectItem value="all">Semua Status</SelectItem>
                     <SelectItem value="pending">Tertunda</SelectItem>
                     <SelectItem value="approved">Diluluskan</SelectItem>
                     <SelectItem value="rejected">Ditolak</SelectItem>
