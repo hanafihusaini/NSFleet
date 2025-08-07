@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Car, Calendar, FileText, BarChart3, Users, LogOut } from "lucide-react";
+import { Car, Calendar, FileText, BarChart3, Users, LogOut, User as UserIcon, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -47,6 +47,18 @@ export function Layout({ children, title }: LayoutProps) {
       path: '/users', 
       label: 'Pengguna', 
       icon: Users,
+      roles: ['admin', 'superadmin']
+    },
+    { 
+      path: '/drivers', 
+      label: 'Pemandu', 
+      icon: UserIcon,
+      roles: ['admin', 'superadmin']
+    },
+    { 
+      path: '/vehicles', 
+      label: 'Kenderaan', 
+      icon: Truck,
       roles: ['admin', 'superadmin']
     },
   ];
