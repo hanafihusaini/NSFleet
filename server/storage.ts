@@ -159,6 +159,12 @@ export class DatabaseStorage implements IStorage {
       if (filters.purpose) {
         conditions.push(sql`LOWER(${bookings.purpose}) LIKE LOWER(${'%' + filters.purpose + '%'})`);
       }
+      if (filters.driverName) {
+        conditions.push(sql`LOWER(${drivers.name}) LIKE LOWER(${'%' + filters.driverName + '%'})`);
+      }
+      if (filters.vehicleNumber) {
+        conditions.push(sql`LOWER(${vehicles.plateNumber}) LIKE LOWER(${'%' + filters.vehicleNumber + '%'})`);
+      }
       if (filters.departureDate) {
         // Show bookings where the filter date falls within the booking date range
         const filterDate = filters.departureDate + ' 00:00:00';
@@ -223,7 +229,11 @@ export class DatabaseStorage implements IStorage {
       .offset(filters?.offset || 0);
 
     return {
-      bookings: results.map(r => r.bookings),
+      bookings: results.map(r => ({
+        ...r.bookings,
+        driverName: r.drivers?.name || null,
+        vehicleInfo: r.vehicles ? `${r.vehicles.model} (${r.vehicles.plateNumber})` : null
+      })),
       total
     };
   }

@@ -30,6 +30,8 @@ export default function Applications() {
     departureDate: '',
     destination: '',
     purpose: '',
+    driverName: '',
+    vehicleNumber: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -118,7 +120,7 @@ export default function Applications() {
             <CardTitle>Penapis & Carian</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <Select value={filters.status} onValueChange={(value) => setFilters({...filters, status: value})}>
@@ -170,6 +172,24 @@ export default function Applications() {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pemandu</label>
+                <Input 
+                  placeholder="Cari pemandu..."
+                  value={filters.driverName}
+                  onChange={(e) => setFilters({...filters, driverName: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kenderaan</label>
+                <Input 
+                  placeholder="Cari kenderaan..."
+                  value={filters.vehicleNumber}
+                  onChange={(e) => setFilters({...filters, vehicleNumber: e.target.value})}
+                />
+              </div>
+
               <div className="flex items-end">
                 <Button onClick={handleSearch} className="w-full">
                   <Search className="h-4 w-4 mr-2" />
@@ -202,6 +222,8 @@ export default function Applications() {
                       <TableHead>Tarikh & Masa Pergi/Balik</TableHead>
                       <TableHead>Destinasi</TableHead>
                       <TableHead>Tujuan</TableHead>
+                      <TableHead>Pemandu</TableHead>
+                      <TableHead>Kenderaan</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Masa Pemprosesan</TableHead>
                       <TableHead>Tindakan</TableHead>
@@ -222,6 +244,16 @@ export default function Applications() {
                           <TableCell>{booking.destination}</TableCell>
                           <TableCell className="max-w-xs truncate" title={booking.purpose}>
                             {booking.purpose}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-gray-600">
+                              {booking.driverName || '-'}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-gray-600">
+                              {booking.vehicleInfo || '-'}
+                            </span>
                           </TableCell>
                           <TableCell>{getStatusBadge(booking.status)}</TableCell>
                           <TableCell>

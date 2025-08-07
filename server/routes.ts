@@ -117,6 +117,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           destination: req.query.destination,
           purpose: req.query.purpose,
           departureDate: req.query.departureDate,
+          driverName: req.query.driverName,
+          vehicleNumber: req.query.vehicleNumber,
           limit: parseInt(req.query.limit as string) || 10,
           offset: parseInt(req.query.offset as string) || 0,
         };
