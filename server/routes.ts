@@ -29,6 +29,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
+      
+      // Update user session with database role
+      if (user && req.user.claims) {
+        req.user.claims.role = user.role;
+      }
+      
       res.json(user);
     } catch (error) {
       handleError(error, req, res);
@@ -38,8 +44,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User management routes
   app.get('/api/users', isAuthenticated, async (req: any, res) => {
     try {
-      const userRole = req.user?.claims?.role;
-      if (userRole !== 'admin' && userRole !== 'superadmin') {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
         return res.status(403).json({ message: "Access denied" });
       }
       
@@ -52,8 +61,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/users/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userRole = req.user?.claims?.role;
-      if (userRole !== 'admin' && userRole !== 'superadmin') {
+      const requestingUserId = req.user.claims.sub;
+      
+      // Get requesting user role from database
+      const requestingUser = await storage.getUser(requestingUserId);
+      if (!requestingUser || (requestingUser.role !== 'admin' && requestingUser.role !== 'superadmin')) {
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -105,9 +117,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/bookings', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const userRole = req.user.claims.role;
       
-      if (userRole === 'user') {
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role === 'user') {
         const bookings = await storage.getUserBookings(userId);
         res.json(bookings);
       } else {
@@ -148,12 +165,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/bookings/:id/process', isAuthenticated, async (req: any, res) => {
     try {
-      const userRole = req.user.claims.role;
       const userId = req.user.claims.sub;
       
-      if (userRole !== 'admin' && userRole !== 'superadmin') {
+      // Get user role from database to ensure it's current
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
         return res.status(403).json({ message: "Access denied" });
       }
+      
+      // Update session with current role
+      req.user.claims.role = user.role;
 
       const bookingId = req.params.id;
       const { status, driverId, vehicleId, driverInstruction, rejectionReason } = req.body;
@@ -214,10 +235,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/bookings/:id/modify', isAuthenticated, async (req: any, res) => {
     try {
-      const userRole = req.user.claims.role;
       const userId = req.user.claims.sub;
       
-      if (userRole !== 'superadmin') {
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || user.role !== 'superadmin') {
         return res.status(403).json({ message: "Only Super Admin can modify processed bookings" });
       }
 
@@ -284,8 +306,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/drivers', isAuthenticated, async (req: any, res) => {
     try {
-      const userRole = req.user.claims.role;
-      if (userRole !== 'admin' && userRole !== 'superadmin') {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -312,8 +337,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/vehicles', isAuthenticated, async (req: any, res) => {
     try {
-      const userRole = req.user.claims.role;
-      if (userRole !== 'admin' && userRole !== 'superadmin') {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -346,8 +374,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Error logs route (admin only)
   app.get('/api/errors', isAuthenticated, async (req: any, res) => {
     try {
-      const userRole = req.user.claims.role;
-      if (userRole !== 'admin' && userRole !== 'superadmin') {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
         return res.status(403).json({ message: "Access denied" });
       }
 
