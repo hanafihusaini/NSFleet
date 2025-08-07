@@ -254,40 +254,45 @@ export class DatabaseStorage implements IStorage {
     vehicleId?: string,
     excludeBookingId?: string
   ): Promise<Booking[]> {
-    const conditions: any[] = [
+    // Base conditions: approved bookings with time overlap
+    let baseConditions = [
       eq(bookings.status, 'approved'),
-      or(
-        and(
-          gte(bookings.departureDate, departureDate),
-          lte(bookings.departureDate, returnDate)
-        ),
-        and(
-          gte(bookings.returnDate, departureDate),
-          lte(bookings.returnDate, returnDate)
-        ),
-        and(
-          lte(bookings.departureDate, departureDate),
-          gte(bookings.returnDate, returnDate)
-        )
+      // Two date ranges overlap if: start1 < end2 AND start2 < end1
+      and(
+        sql`${bookings.departureDate} < ${returnDate}`,
+        sql`${departureDate} < ${bookings.returnDate}`
       )
     ];
 
-    if (driverId) {
-      conditions.push(eq(bookings.driverId, driverId));
-    }
-
-    if (vehicleId) {
-      conditions.push(eq(bookings.vehicleId, vehicleId));
-    }
-
+    // Exclude the current booking if specified
     if (excludeBookingId) {
-      conditions.push(sql`${bookings.id} != ${excludeBookingId}`);
+      baseConditions.push(sql`${bookings.id} != ${excludeBookingId}`);
     }
+
+    // Resource conditions (driver OR vehicle conflicts)
+    const resourceConditions: any[] = [];
+    if (driverId) {
+      resourceConditions.push(eq(bookings.driverId, driverId));
+    }
+    if (vehicleId) {
+      resourceConditions.push(eq(bookings.vehicleId, vehicleId));
+    }
+
+    // If no resources specified, return empty array
+    if (resourceConditions.length === 0) {
+      return [];
+    }
+
+    // Final condition: base conditions AND (driver conflict OR vehicle conflict)
+    const finalConditions = [
+      ...baseConditions,
+      resourceConditions.length === 1 ? resourceConditions[0] : or(...resourceConditions)
+    ];
 
     return await db
       .select()
       .from(bookings)
-      .where(and(...conditions));
+      .where(and(...finalConditions));
   }
 
   // Driver operations
