@@ -17,7 +17,7 @@ import Vehicles from "@/pages/Vehicles";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth() as { isAuthenticated: boolean; isLoading: boolean; user?: any };
 
   if (isLoading) {
     return (

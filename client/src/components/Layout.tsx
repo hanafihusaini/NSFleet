@@ -12,7 +12,7 @@ interface LayoutProps {
 
 export function Layout({ children, title }: LayoutProps) {
   const [location] = useLocation();
-  const { user } = useAuth();
+  const { user } = useAuth() as { user?: any };
 
   const handleLogout = () => {
     window.location.href = "/api/logout";
@@ -101,7 +101,7 @@ export function Layout({ children, title }: LayoutProps) {
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-white text-sm">
-                <span>{user?.firstName} {user?.lastName}</span>
+                <span>{user?.firstName || ''} {user?.lastName || ''}</span>
                 <span className="text-blue-200 ml-2">
                   | {user?.role === 'superadmin' ? 'Super Admin' : user?.role === 'admin' ? 'Admin' : 'Pengguna'}
                 </span>
