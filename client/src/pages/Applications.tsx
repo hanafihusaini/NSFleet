@@ -30,8 +30,8 @@ export default function Applications() {
     departureDate: '',
     destination: '',
     purpose: '',
-    driverId: '',
-    vehicleId: '',
+    driverId: 'all',
+    vehicleId: 'all',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
