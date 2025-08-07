@@ -132,23 +132,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserBookings(userId: string): Promise<Booking[]> {
-    return await db
+    const results = await db
       .select()
       .from(bookings)
       .leftJoin(drivers, eq(bookings.driverId, drivers.id))
       .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id))
       .where(eq(bookings.userId, userId))
       .orderBy(desc(bookings.submissionDate));
+      
+    return results.map(r => r.bookings);
   }
 
   async getAllBookings(filters?: any): Promise<{ bookings: Booking[]; total: number }> {
-    let query = db
-      .select()
-      .from(bookings)
-      .leftJoin(users, eq(bookings.userId, users.id))
-      .leftJoin(drivers, eq(bookings.driverId, drivers.id))
-      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id));
-
     const conditions: any[] = [];
 
     if (filters) {
@@ -156,32 +151,51 @@ export class DatabaseStorage implements IStorage {
         conditions.push(eq(bookings.status, filters.status));
       }
       if (filters.applicantName) {
-        conditions.push(like(bookings.applicantName, `%${filters.applicantName}%`));
+        conditions.push(sql`LOWER(${bookings.applicantName}) LIKE LOWER(${'%' + filters.applicantName + '%'})`);
       }
       if (filters.destination) {
-        conditions.push(like(bookings.destination, `%${filters.destination}%`));
+        conditions.push(sql`LOWER(${bookings.destination}) LIKE LOWER(${'%' + filters.destination + '%'})`);
       }
       if (filters.purpose) {
-        conditions.push(like(bookings.purpose, `%${filters.purpose}%`));
+        conditions.push(sql`LOWER(${bookings.purpose}) LIKE LOWER(${'%' + filters.purpose + '%'})`);
       }
       if (filters.departureDate) {
-        conditions.push(gte(bookings.departureDate, new Date(filters.departureDate)));
+        // Show bookings where the filter date falls within the booking date range
+        const filterDate = new Date(filters.departureDate);
+        conditions.push(
+          and(
+            lte(bookings.departureDate, filterDate),
+            gte(bookings.returnDate, filterDate)
+          )
+        );
       }
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    // Build the queries with conditions
+    const baseQuery = db
+      .select()
+      .from(bookings)
+      .leftJoin(users, eq(bookings.userId, users.id))
+      .leftJoin(drivers, eq(bookings.driverId, drivers.id))
+      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id));
+
+    const baseCountQuery = db
+      .select({ count: count() })
+      .from(bookings)
+      .leftJoin(users, eq(bookings.userId, users.id))
+      .leftJoin(drivers, eq(bookings.driverId, drivers.id))
+      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id));
+
+    // Apply conditions if any
+    const query = conditions.length > 0 
+      ? baseQuery.where(and(...conditions))
+      : baseQuery;
+      
+    const totalQuery = conditions.length > 0 
+      ? baseCountQuery.where(and(...conditions))
+      : baseCountQuery;
 
     // Get total count
-    const totalQuery = db
-      .select({ count: count() })
-      .from(bookings);
-    
-    if (conditions.length > 0) {
-      totalQuery.where(and(...conditions));
-    }
-
     const [{ count: total }] = await totalQuery;
 
     // Get paginated results
