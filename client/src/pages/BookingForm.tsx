@@ -13,7 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@shared/schema";
 import { useLocation } from "wouter";
 import { Calendar, Clock, User as UserIcon, MapPin, FileText } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 
 const bookingSchema = z.object({
@@ -33,7 +33,7 @@ type BookingFormData = z.infer<typeof bookingSchema>;
 
 export default function BookingForm() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuth() as { user?: User };
   const [, setLocation] = useLocation();
 
   const form = useForm<BookingFormData>({
@@ -68,6 +68,10 @@ export default function BookingForm() {
       return apiRequest('POST', '/api/bookings', bookingData);
     },
     onSuccess: () => {
+      // Invalidate booking queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/bookings/stats'] });
+      
       toast({
         title: "Tempahan Berjaya",
         description: "Permohonan tempahan kenderaan telah dihantar. Anda akan menerima notifikasi email mengenai status permohonan.",
