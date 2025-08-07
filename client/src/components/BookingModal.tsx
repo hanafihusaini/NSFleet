@@ -16,19 +16,19 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      pending: "bg-pending bg-opacity-10 text-pending",
-      approved: "bg-approved bg-opacity-10 text-approved",
-      rejected: "bg-rejected bg-opacity-10 text-rejected",
+      pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      approved: "bg-green-100 text-green-800 border-green-200",
+      rejected: "bg-red-100 text-red-800 border-red-200",
     };
     
     const labels = {
-      pending: "Tertunda",
+      pending: "Baru",
       approved: "Diluluskan",
       rejected: "Ditolak",
     };
 
     return (
-      <Badge className={variants[status as keyof typeof variants]}>
+      <Badge variant="outline" className={variants[status as keyof typeof variants]}>
         {labels[status as keyof typeof labels]}
       </Badge>
     );

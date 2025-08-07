@@ -9,11 +9,11 @@ export function StatsCards() {
 
   const statsData = [
     {
-      title: "Permohonan Tertunda",
+      title: "Permohonan Baru",
       value: stats?.pending || 0,
       icon: Clock,
-      bgColor: "bg-pending bg-opacity-10",
-      textColor: "text-pending",
+      bgColor: "bg-yellow-100",
+      textColor: "text-yellow-800",
     },
     {
       title: "Diluluskan",

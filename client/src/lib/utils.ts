@@ -87,7 +87,7 @@ export function formatRoleLabel(role: string): string {
 
 export function formatStatusLabel(status: string): string {
   const statusLabels = {
-    pending: 'Tertunda',
+    pending: 'Baru',
     approved: 'Diluluskan',
     rejected: 'Ditolak',
   };

@@ -74,7 +74,7 @@ export default function Applications() {
     };
     
     const labels = {
-      pending: "Tertunda",
+      pending: "Baru",
       approved: "Diluluskan",
       rejected: "Ditolak",
     };
@@ -127,7 +127,7 @@ export default function Applications() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Semua Status</SelectItem>
-                    <SelectItem value="pending">Tertunda</SelectItem>
+                    <SelectItem value="pending">Baru</SelectItem>
                     <SelectItem value="approved">Diluluskan</SelectItem>
                     <SelectItem value="rejected">Ditolak</SelectItem>
                   </SelectContent>
