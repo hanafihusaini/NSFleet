@@ -57,8 +57,8 @@ export default function BookingForm() {
       const bookingData = {
         applicantName: data.applicantName,
         applicantUnit: data.applicantUnit,
-        departureDate: departureDateTime.toISOString(),
-        returnDate: returnDateTime.toISOString(),
+        departureDate: departureDateTime,
+        returnDate: returnDateTime,
         passengerName: data.passengerName || null,
         destination: data.destination,
         purpose: data.purpose,
