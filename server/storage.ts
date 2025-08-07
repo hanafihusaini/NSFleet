@@ -162,28 +162,10 @@ export class DatabaseStorage implements IStorage {
         conditions.push(sql`LOWER(${bookings.purpose}) LIKE LOWER(${'%' + filters.purpose + '%'})`);
       }
       if (filters.driverId) {
-        // Show approved bookings with this driver OR non-approved bookings (no driver assigned yet)
-        conditions.push(
-          or(
-            eq(bookings.driverId, filters.driverId),
-            and(
-              ne(bookings.status, 'approved'),
-              sql`${bookings.driverId} IS NULL`
-            )
-          )
-        );
+        conditions.push(eq(bookings.driverId, filters.driverId));
       }
       if (filters.vehicleId) {
-        // Show approved bookings with this vehicle OR non-approved bookings (no vehicle assigned yet)
-        conditions.push(
-          or(
-            eq(bookings.vehicleId, filters.vehicleId),
-            and(
-              ne(bookings.status, 'approved'),
-              sql`${bookings.vehicleId} IS NULL`
-            )
-          )
-        );
+        conditions.push(eq(bookings.vehicleId, filters.vehicleId));
       }
       if (filters.departureDate) {
         // Show bookings where the filter date falls within the booking date range
