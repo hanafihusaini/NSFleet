@@ -17,7 +17,7 @@ export default function BookingStatus() {
   const [showModal, setShowModal] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const { data: userBookings, isLoading } = useQuery({
+  const { data: userBookingsResponse, isLoading } = useQuery({
     queryKey: ['/api/bookings'],
   });
 
@@ -46,9 +46,14 @@ export default function BookingStatus() {
     );
   };
 
-  const filteredBookings = userBookings?.filter((booking: any) => 
+  // Handle both response formats: direct array (for users) or object with bookings property (for admins)
+  const userBookings = Array.isArray(userBookingsResponse) 
+    ? userBookingsResponse 
+    : userBookingsResponse?.bookings || [];
+
+  const filteredBookings = userBookings.filter((booking: any) => 
     !statusFilter || statusFilter === 'all' || booking.status === statusFilter
-  ) || [];
+  );
 
   return (
     <Layout title="Status Tempahan Saya">
