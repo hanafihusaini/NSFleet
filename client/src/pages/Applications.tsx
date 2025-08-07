@@ -30,8 +30,8 @@ export default function Applications() {
     departureDate: '',
     destination: '',
     purpose: '',
-    driverName: '',
-    vehicleNumber: '',
+    driverId: '',
+    vehicleId: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -51,6 +51,16 @@ export default function Applications() {
       if (!response.ok) throw new Error('Failed to fetch bookings');
       return response.json();
     },
+  });
+
+  // Fetch drivers for dropdown
+  const { data: drivers = [] } = useQuery({
+    queryKey: ['/api/drivers'],
+  });
+
+  // Fetch vehicles for dropdown
+  const { data: vehicles = [] } = useQuery({
+    queryKey: ['/api/vehicles'],
   });
 
   const handleSearch = () => {
@@ -174,20 +184,36 @@ export default function Applications() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pemandu</label>
-                <Input 
-                  placeholder="Cari pemandu..."
-                  value={filters.driverName}
-                  onChange={(e) => setFilters({...filters, driverName: e.target.value})}
-                />
+                <Select value={filters.driverId} onValueChange={(value) => setFilters({...filters, driverId: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Pemandu" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Pemandu</SelectItem>
+                    {(drivers as any[])?.map((driver: any) => (
+                      <SelectItem key={driver.id} value={driver.id}>
+                        {driver.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Kenderaan</label>
-                <Input 
-                  placeholder="Cari kenderaan..."
-                  value={filters.vehicleNumber}
-                  onChange={(e) => setFilters({...filters, vehicleNumber: e.target.value})}
-                />
+                <Select value={filters.vehicleId} onValueChange={(value) => setFilters({...filters, vehicleId: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Kenderaan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kenderaan</SelectItem>
+                    {(vehicles as any[])?.map((vehicle: any) => (
+                      <SelectItem key={vehicle.id} value={vehicle.id}>
+                        {vehicle.model} - {vehicle.plateNumber}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-end">

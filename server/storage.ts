@@ -43,11 +43,13 @@ export interface IStorage {
   getAllDrivers(): Promise<Driver[]>;
   createDriver(driver: InsertDriver): Promise<Driver>;
   updateDriver(id: string, updates: Partial<Driver>): Promise<Driver>;
+  deleteDriver(id: string): Promise<void>;
   
   // Vehicle operations
   getAllVehicles(): Promise<Vehicle[]>;
   createVehicle(vehicle: InsertVehicle): Promise<Vehicle>;
   updateVehicle(id: string, updates: Partial<Vehicle>): Promise<Vehicle>;
+  deleteVehicle(id: string): Promise<void>;
   
   // Audit trail
   createAuditEntry(entry: Omit<AuditTrail, 'id' | 'timestamp'>): Promise<AuditTrail>;
@@ -159,11 +161,11 @@ export class DatabaseStorage implements IStorage {
       if (filters.purpose) {
         conditions.push(sql`LOWER(${bookings.purpose}) LIKE LOWER(${'%' + filters.purpose + '%'})`);
       }
-      if (filters.driverName) {
-        conditions.push(sql`LOWER(${drivers.name}) LIKE LOWER(${'%' + filters.driverName + '%'})`);
+      if (filters.driverId) {
+        conditions.push(eq(bookings.driverId, filters.driverId));
       }
-      if (filters.vehicleNumber) {
-        conditions.push(sql`LOWER(${vehicles.plateNumber}) LIKE LOWER(${'%' + filters.vehicleNumber + '%'})`);
+      if (filters.vehicleId) {
+        conditions.push(eq(bookings.vehicleId, filters.vehicleId));
       }
       if (filters.departureDate) {
         // Show bookings where the filter date falls within the booking date range
@@ -321,6 +323,13 @@ export class DatabaseStorage implements IStorage {
     return driver;
   }
 
+  async deleteDriver(id: string): Promise<void> {
+    await db
+      .update(drivers)
+      .set({ isActive: false })
+      .where(eq(drivers.id, id));
+  }
+
   // Vehicle operations
   async getAllVehicles(): Promise<Vehicle[]> {
     return await db
@@ -345,6 +354,13 @@ export class DatabaseStorage implements IStorage {
       .where(eq(vehicles.id, id))
       .returning();
     return vehicle;
+  }
+
+  async deleteVehicle(id: string): Promise<void> {
+    await db
+      .update(vehicles)
+      .set({ isActive: false })
+      .where(eq(vehicles.id, id));
   }
 
   // Audit trail

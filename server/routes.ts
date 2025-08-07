@@ -134,8 +134,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           destination: req.query.destination,
           purpose: req.query.purpose,
           departureDate: req.query.departureDate,
-          driverName: req.query.driverName,
-          vehicleNumber: req.query.vehicleNumber,
+          driverId: req.query.driverId,
+          vehicleId: req.query.vehicleId,
           limit: parseInt(req.query.limit as string) || 10,
           offset: parseInt(req.query.offset as string) || 0,
         };
@@ -325,6 +325,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put('/api/drivers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const driverId = req.params.id;
+      const driverData = insertDriverSchema.partial().parse(req.body);
+      const driver = await storage.updateDriver(driverId, driverData);
+      res.json(driver);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid driver data", errors: error.errors });
+      }
+      handleError(error, req, res);
+    }
+  });
+
+  app.delete('/api/drivers/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const driverId = req.params.id;
+      await storage.deleteDriver(driverId);
+      res.json({ message: "Driver deleted successfully" });
+    } catch (error) {
+      handleError(error, req, res);
+    }
+  });
+
   // Vehicle routes
   app.get('/api/vehicles', isAuthenticated, async (req: any, res) => {
     try {
@@ -352,6 +392,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid vehicle data", errors: error.errors });
       }
+      handleError(error, req, res);
+    }
+  });
+
+  app.put('/api/vehicles/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const vehicleId = req.params.id;
+      const vehicleData = insertVehicleSchema.partial().parse(req.body);
+      const vehicle = await storage.updateVehicle(vehicleId, vehicleData);
+      res.json(vehicle);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid vehicle data", errors: error.errors });
+      }
+      handleError(error, req, res);
+    }
+  });
+
+  app.delete('/api/vehicles/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get user role from database
+      const user = await storage.getUser(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const vehicleId = req.params.id;
+      await storage.deleteVehicle(vehicleId);
+      res.json({ message: "Vehicle deleted successfully" });
+    } catch (error) {
       handleError(error, req, res);
     }
   });
