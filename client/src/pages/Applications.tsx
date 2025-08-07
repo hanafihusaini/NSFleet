@@ -68,9 +68,9 @@ export default function Applications() {
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      pending: "bg-pending bg-opacity-10 text-pending",
-      approved: "bg-approved bg-opacity-10 text-approved",
-      rejected: "bg-rejected bg-opacity-10 text-rejected",
+      pending: "bg-pending bg-opacity-10 text-pending border border-pending",
+      approved: "bg-approved bg-opacity-10 text-approved border border-approved", 
+      rejected: "bg-rejected bg-opacity-10 text-rejected border border-rejected",
     };
     
     const labels = {
@@ -80,7 +80,7 @@ export default function Applications() {
     };
 
     return (
-      <Badge className={variants[status as keyof typeof variants]}>
+      <Badge variant="outline" className={variants[status as keyof typeof variants]}>
         {labels[status as keyof typeof labels]}
       </Badge>
     );

@@ -161,11 +161,25 @@ export class DatabaseStorage implements IStorage {
       }
       if (filters.departureDate) {
         // Show bookings where the filter date falls within the booking date range
-        const filterDate = new Date(filters.departureDate);
+        const filterDate = filters.departureDate + ' 00:00:00';
+        const filterDateEnd = filters.departureDate + ' 23:59:59';
         conditions.push(
-          and(
-            lte(bookings.departureDate, filterDate),
-            gte(bookings.returnDate, filterDate)
+          or(
+            // Booking starts on the filter date
+            and(
+              gte(bookings.departureDate, new Date(filterDate)),
+              lte(bookings.departureDate, new Date(filterDateEnd))
+            ),
+            // Booking ends on the filter date  
+            and(
+              gte(bookings.returnDate, new Date(filterDate)),
+              lte(bookings.returnDate, new Date(filterDateEnd))
+            ),
+            // Filter date falls within the booking period
+            and(
+              lte(bookings.departureDate, new Date(filterDate)),
+              gte(bookings.returnDate, new Date(filterDateEnd))
+            )
           )
         );
       }
