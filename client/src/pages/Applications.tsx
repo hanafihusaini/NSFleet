@@ -249,7 +249,7 @@ export default function Applications() {
                       <TableHead>Destinasi</TableHead>
                       <TableHead>Tujuan</TableHead>
                       <TableHead>Pemandu</TableHead>
-                      <TableHead>Arahan kepada Pemandu</TableHead>
+                      <TableHead>Pemandu Tunggu</TableHead>
                       <TableHead>Kenderaan</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Masa Pemprosesan</TableHead>
@@ -277,9 +277,10 @@ export default function Applications() {
                               {booking.driverName || '-'}
                             </span>
                           </TableCell>
-                          <TableCell className="max-w-xs">
-                            <span className="text-sm text-gray-600 truncate" title={booking.driverInstruction || ''}>
-                              {booking.driverInstruction || '-'}
+                          <TableCell>
+                            <span className="text-sm text-gray-600">
+                              {booking.driverInstruction === 'Driver Must Wait' ? 'Ya' : 
+                               booking.driverInstruction === 'Driver Need Not Wait' ? 'Tidak' : '-'}
                             </span>
                           </TableCell>
                           <TableCell>

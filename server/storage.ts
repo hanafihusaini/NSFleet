@@ -17,7 +17,7 @@ import {
   type SystemError,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, lte, desc, asc, or, like, count } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, or, like, count, ne } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 
 export interface IStorage {
@@ -162,10 +162,28 @@ export class DatabaseStorage implements IStorage {
         conditions.push(sql`LOWER(${bookings.purpose}) LIKE LOWER(${'%' + filters.purpose + '%'})`);
       }
       if (filters.driverId) {
-        conditions.push(eq(bookings.driverId, filters.driverId));
+        // Show approved bookings with this driver OR non-approved bookings (no driver assigned yet)
+        conditions.push(
+          or(
+            eq(bookings.driverId, filters.driverId),
+            and(
+              ne(bookings.status, 'approved'),
+              sql`${bookings.driverId} IS NULL`
+            )
+          )
+        );
       }
       if (filters.vehicleId) {
-        conditions.push(eq(bookings.vehicleId, filters.vehicleId));
+        // Show approved bookings with this vehicle OR non-approved bookings (no vehicle assigned yet)
+        conditions.push(
+          or(
+            eq(bookings.vehicleId, filters.vehicleId),
+            and(
+              ne(bookings.status, 'approved'),
+              sql`${bookings.vehicleId} IS NULL`
+            )
+          )
+        );
       }
       if (filters.departureDate) {
         // Show bookings where the filter date falls within the booking date range
