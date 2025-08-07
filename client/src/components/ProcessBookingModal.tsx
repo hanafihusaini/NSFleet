@@ -19,7 +19,7 @@ interface ProcessBookingModalProps {
 }
 
 export function ProcessBookingModal({ booking, isOpen, onClose, onSuccess }: ProcessBookingModalProps) {
-  const { user } = useAuth();
+  const { user } = useAuth() as { user?: any };
   const { toast } = useToast();
   const [action, setAction] = useState<'approve' | 'reject' | ''>('');
   const [driverId, setDriverId] = useState('');
@@ -256,7 +256,7 @@ export function ProcessBookingModal({ booking, isOpen, onClose, onSuccess }: Pro
                       <SelectValue placeholder="Pilih Pemandu" />
                     </SelectTrigger>
                     <SelectContent>
-                      {drivers?.map((driver: any) => (
+                      {(drivers as any[])?.map((driver: any) => (
                         <SelectItem key={driver.id} value={driver.id}>
                           {driver.name}
                         </SelectItem>
@@ -274,7 +274,7 @@ export function ProcessBookingModal({ booking, isOpen, onClose, onSuccess }: Pro
                       <SelectValue placeholder="Pilih Kenderaan" />
                     </SelectTrigger>
                     <SelectContent>
-                      {vehicles?.map((vehicle: any) => (
+                      {(vehicles as any[])?.map((vehicle: any) => (
                         <SelectItem key={vehicle.id} value={vehicle.id}>
                           {vehicle.model} - {vehicle.plateNumber}
                         </SelectItem>

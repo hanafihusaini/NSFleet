@@ -385,6 +385,7 @@ export default function Applications() {
         onClose={() => setShowProcessModal(false)}
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/stats'] });
           setShowProcessModal(false);
         }}
       />
