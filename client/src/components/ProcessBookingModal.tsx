@@ -52,9 +52,43 @@ export function ProcessBookingModal({ booking, isOpen, onClose, onSuccess }: Pro
       handleClose();
     },
     onError: (error: any) => {
+      let title = "Ralat";
+      let description = "Gagal memproses permohonan";
+      
+      // Handle booking conflict errors specifically
+      if (error.message && error.message.includes('Booking conflicts detected')) {
+        try {
+          // Try to parse the JSON error message
+          const errorData = JSON.parse(error.message.split(': ', 2)[1]);
+          if (errorData.conflicts && errorData.conflicts.length > 0) {
+            const conflict = errorData.conflicts[0];
+            title = "Konflik Tempahan Dikesan";
+            description = `Konflik dengan tempahan ID ${conflict.bookingId || conflict.id}. Pemandu atau kenderaan sudah ditugaskan pada waktu yang bertindih. Sila pilih pemandu atau kenderaan lain.`;
+          } else {
+            description = "Pemandu atau kenderaan sudah ditugaskan pada waktu yang sama. Sila pilih sumber lain.";
+          }
+        } catch {
+          // If parsing fails, use a generic conflict message
+          title = "Konflik Tempahan Dikesan";
+          description = "Pemandu atau kenderaan sudah ditugaskan pada waktu yang sama. Sila pilih sumber lain.";
+        }
+      } else if (error.message) {
+        // For other errors, clean up the message if it's JSON
+        if (error.message.includes('{') && error.message.includes('}')) {
+          try {
+            const errorData = JSON.parse(error.message.split(': ', 2)[1]);
+            description = errorData.message || "Gagal memproses permohonan";
+          } catch {
+            description = error.message;
+          }
+        } else {
+          description = error.message;
+        }
+      }
+      
       toast({
-        title: "Ralat",
-        description: error.message || "Gagal memproses permohonan",
+        title,
+        description,
         variant: "destructive",
       });
     },
