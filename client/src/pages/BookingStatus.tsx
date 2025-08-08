@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { BookingModal } from "@/components/BookingModal";
 import { Eye, Calendar } from "lucide-react";
 import { useLocation } from "wouter";
@@ -15,10 +16,20 @@ export default function BookingStatus() {
   const [, setLocation] = useLocation();
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [filters, setFilters] = useState({
+    status: 'all',
+    departureDate: '',
+    destination: '',
+    purpose: '',
+  });
 
   const { data: userBookingsResponse, isLoading } = useQuery({
-    queryKey: ['/api/bookings'],
+    queryKey: ['/api/bookings', filters],
+    queryFn: async () => {
+      const response = await fetch('/api/bookings');
+      if (!response.ok) throw new Error('Failed to fetch bookings');
+      return response.json();
+    },
   });
 
   const handleViewDetails = (booking: any) => {
@@ -51,9 +62,33 @@ export default function BookingStatus() {
     ? userBookingsResponse 
     : (userBookingsResponse as any)?.bookings || [];
 
-  const filteredBookings = userBookings.filter((booking: any) => 
-    !statusFilter || statusFilter === 'all' || booking.status === statusFilter
-  );
+  const filteredBookings = userBookings.filter((booking: any) => {
+    // Status filter
+    if (filters.status && filters.status !== 'all' && booking.status !== filters.status) {
+      return false;
+    }
+    
+    // Date filter
+    if (filters.departureDate) {
+      const bookingDate = new Date(booking.departureDate).toDateString();
+      const filterDate = new Date(filters.departureDate).toDateString();
+      if (bookingDate !== filterDate) {
+        return false;
+      }
+    }
+    
+    // Destination filter
+    if (filters.destination && !booking.destination.toLowerCase().includes(filters.destination.toLowerCase())) {
+      return false;
+    }
+    
+    // Purpose filter
+    if (filters.purpose && !booking.purpose.toLowerCase().includes(filters.purpose.toLowerCase())) {
+      return false;
+    }
+    
+    return true;
+  });
 
   return (
     <Layout title="Status Tempahan Saya">
@@ -64,10 +99,10 @@ export default function BookingStatus() {
             <CardTitle>Penapis</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select value={filters.status} onValueChange={(value) => setFilters({...filters, status: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="Semua Status" />
                   </SelectTrigger>
@@ -79,6 +114,43 @@ export default function BookingStatus() {
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tarikh Perjalanan</label>
+                <Input 
+                  type="date"
+                  value={filters.departureDate}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters({...filters, departureDate: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Destinasi</label>
+                <Input 
+                  placeholder="Cari destinasi..."
+                  value={filters.destination}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters({...filters, destination: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tujuan</label>
+                <Input 
+                  placeholder="Cari tujuan..."
+                  value={filters.purpose}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters({...filters, purpose: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end mt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setFilters({ status: 'all', departureDate: '', destination: '', purpose: '' })}
+                className="mr-2"
+              >
+                Reset Penapis
+              </Button>
             </div>
           </CardContent>
         </Card>
