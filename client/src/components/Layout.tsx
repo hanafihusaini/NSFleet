@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Car, Calendar, FileText, BarChart3, Users, LogOut, User as UserIcon, Truck } from "lucide-react";
+import { Car, Calendar, FileText, BarChart3, Users, LogOut, User as UserIcon, Truck, ChevronDown, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -13,12 +13,28 @@ interface LayoutProps {
 export function Layout({ children, title }: LayoutProps) {
   const [location] = useLocation();
   const { user } = useAuth() as { user?: any };
+  const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
     window.location.href = "/api/logout";
   };
 
-  const navItems = [
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowManagementDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const mainNavItems = [
     { 
       path: user?.role === 'user' ? '/booking' : '/applications', 
       label: user?.role === 'user' ? 'Permohonan' : 'Aplikasi', 
@@ -43,6 +59,9 @@ export function Layout({ children, title }: LayoutProps) {
       icon: BarChart3,
       roles: ['admin', 'superadmin']
     },
+  ];
+
+  const managementItems = [
     { 
       path: '/users', 
       label: 'Pengguna', 
@@ -63,9 +82,16 @@ export function Layout({ children, title }: LayoutProps) {
     },
   ];
 
-  const visibleNavItems = navItems.filter(item => 
+  const visibleMainNavItems = mainNavItems.filter(item => 
     item.roles.includes(user?.role || 'user')
   );
+
+  const visibleManagementItems = managementItems.filter(item => 
+    item.roles.includes(user?.role || 'user')
+  );
+
+  const showManagementMenu = visibleManagementItems.length > 0;
+  const isManagementActive = managementItems.some(item => location === item.path);
 
   return (
     <div className="min-h-screen bg-gov-gray">
@@ -81,7 +107,7 @@ export function Layout({ children, title }: LayoutProps) {
                 </span>
               </div>
               <div className="hidden md:ml-6 md:flex md:space-x-8">
-                {visibleNavItems.map((item) => {
+                {visibleMainNavItems.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Link key={item.path} href={item.path}>
@@ -97,6 +123,50 @@ export function Layout({ children, title }: LayoutProps) {
                     </Link>
                   );
                 })}
+                
+                {showManagementMenu && (
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() => setShowManagementDropdown(!showManagementDropdown)}
+                      className={cn(
+                        "px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2",
+                        isManagementActive
+                          ? "text-white bg-gov-dark"
+                          : "text-blue-200 hover:text-white hover:bg-gov-dark"
+                      )}
+                    >
+                      <Settings className="h-4 w-4" />
+                      Pengurusan
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                    
+                    {showManagementDropdown && (
+                      <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                        <div className="py-1">
+                          {visibleManagementItems.map((item) => {
+                            const Icon = item.icon;
+                            return (
+                              <Link key={item.path} href={item.path}>
+                                <a 
+                                  onClick={() => setShowManagementDropdown(false)}
+                                  className={cn(
+                                    "flex items-center gap-3 px-4 py-2 text-sm hover:bg-gray-100",
+                                    location === item.path
+                                      ? "text-gov-blue font-medium bg-blue-50"
+                                      : "text-gray-700"
+                                  )}
+                                >
+                                  <Icon className="h-4 w-4" />
+                                  {item.label}
+                                </a>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex items-center space-x-4">
