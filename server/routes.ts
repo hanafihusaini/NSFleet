@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update session with current role
-      req.user.claims.role = user.role;
+      req.user.role = user.role;
 
       const bookingId = req.params.id;
       const { status, driverId, vehicleId, driverInstruction, rejectionReason } = req.body;
