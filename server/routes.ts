@@ -294,6 +294,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/bookings/:id/cancel', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const bookingId = req.params.id;
+      
+      const existingBooking = await storage.getBooking(bookingId);
+      if (!existingBooking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      // Verify user owns this booking
+      if (existingBooking.userId !== userId) {
+        return res.status(403).json({ message: "You can only cancel your own bookings" });
+      }
+
+      // Check if booking can be cancelled
+      if (existingBooking.status !== 'pending' && existingBooking.status !== 'approved') {
+        return res.status(400).json({ message: "Only pending or approved bookings can be cancelled" });
+      }
+
+      // Check if booking is in the future
+      const now = new Date();
+      const departureDate = new Date(existingBooking.departureDate);
+      if (departureDate <= now) {
+        return res.status(400).json({ message: "Cannot cancel bookings that have already started" });
+      }
+
+      const updates = {
+        status: 'dibatalkan' as const,
+        processedDate: new Date(),
+        processedBy: userId,
+      };
+
+      const updatedBooking = await storage.updateBooking(bookingId, updates);
+      
+      // Create audit entry
+      await storage.createAuditEntry({
+        bookingId,
+        userId,
+        action: 'cancelled',
+        oldValues: existingBooking,
+        newValues: updatedBooking,
+      });
+
+      res.json(updatedBooking);
+    } catch (error) {
+      handleError(error, req, res);
+    }
+  });
+
   // Driver routes
   app.get('/api/drivers', isAuthenticated, async (req: any, res) => {
     try {

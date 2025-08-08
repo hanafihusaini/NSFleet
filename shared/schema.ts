@@ -59,7 +59,7 @@ export const vehicles = pgTable("vehicles", {
 });
 
 // Booking status enum
-export const bookingStatusEnum = pgEnum('booking_status', ['pending', 'approved', 'rejected']);
+export const bookingStatusEnum = pgEnum('booking_status', ['pending', 'approved', 'rejected', 'dibatalkan']);
 
 // Bookings table
 export const bookings = pgTable("bookings", {
@@ -92,7 +92,7 @@ export const auditTrail = pgTable("audit_trail", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   bookingId: varchar("booking_id").notNull().references(() => bookings.id),
   userId: varchar("user_id").notNull().references(() => users.id),
-  action: varchar("action").notNull(), // created, approved, rejected, modified
+  action: varchar("action").notNull(), // created, approved, rejected, modified, cancelled
   oldValues: jsonb("old_values"),
   newValues: jsonb("new_values"),
   timestamp: timestamp("timestamp").defaultNow(),

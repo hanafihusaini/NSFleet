@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,12 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookingModal } from "@/components/BookingModal";
-import { Eye, Calendar } from "lucide-react";
+import { Eye, Calendar, X } from "lucide-react";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 import { format } from "date-fns";
 
 export default function BookingStatus() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [filters, setFilters] = useState({
@@ -32,9 +37,56 @@ export default function BookingStatus() {
     },
   });
 
+  // Cancel booking mutation
+  const cancelMutation = useMutation({
+    mutationFn: async (bookingId: string) => {
+      return apiRequest('POST', `/api/bookings/${bookingId}/cancel`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
+      toast({
+        title: "Tempahan Dibatalkan",
+        description: "Tempahan anda telah berjaya dibatalkan",
+      });
+    },
+    onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda telah log keluar. Log masuk semula...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Ralat",
+        description: error.message || "Gagal membatalkan tempahan",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleViewDetails = (booking: any) => {
     setSelectedBooking(booking);
     setShowModal(true);
+  };
+
+  const handleCancelBooking = (booking: any) => {
+    if (confirm('Adakah anda pasti ingin membatalkan tempahan ini?')) {
+      cancelMutation.mutate(booking.id);
+    }
+  };
+
+  const canCancelBooking = (booking: any) => {
+    // Only allow cancellation for pending or approved bookings
+    // and only for future bookings
+    const now = new Date();
+    const departureDate = new Date(booking.departureDate);
+    return (booking.status === 'pending' || booking.status === 'approved') && 
+           departureDate > now;
   };
 
   const getStatusBadge = (status: string) => {
@@ -42,12 +94,14 @@ export default function BookingStatus() {
       pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
       approved: "bg-green-100 text-green-800 border-green-200",
       rejected: "bg-red-100 text-red-800 border-red-200",
+      dibatalkan: "bg-gray-100 text-gray-800 border-gray-200",
     };
     
     const labels = {
       pending: "Baru",
       approved: "Diluluskan",
       rejected: "Ditolak",
+      dibatalkan: "Dibatalkan",
     };
 
     return (
@@ -119,6 +173,7 @@ export default function BookingStatus() {
                     <SelectItem value="pending">Baru</SelectItem>
                     <SelectItem value="approved">Diluluskan</SelectItem>
                     <SelectItem value="rejected">Ditolak</SelectItem>
+                    <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -206,13 +261,26 @@ export default function BookingStatus() {
                         <TableCell>{getStatusBadge(booking.status)}</TableCell>
                         <TableCell>{format(new Date(booking.submissionDate), 'dd/MM/yyyy')}</TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewDetails(booking)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewDetails(booking)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            {canCancelBooking(booking) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleCancelBooking(booking)}
+                                disabled={cancelMutation.isPending}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
