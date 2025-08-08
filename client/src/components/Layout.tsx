@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Car, Calendar, FileText, BarChart3, Users, LogOut, User as UserIcon, Truck, ChevronDown, Settings } from "lucide-react";
+import { Car, Calendar, FileText, BarChart3, Users, LogOut, User as UserIcon, Truck, ChevronDown, Settings, TestTube } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -79,6 +79,12 @@ export function Layout({ children, title }: LayoutProps) {
       label: 'Kenderaan', 
       icon: Truck,
       roles: ['admin', 'superadmin']
+    },
+    { 
+      path: '/role-testing', 
+      label: 'Pengujian Peranan', 
+      icon: TestTube,
+      roles: ['user', 'admin', 'superadmin']
     },
   ];
 

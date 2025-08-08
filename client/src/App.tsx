@@ -14,6 +14,7 @@ import Reports from "@/pages/Reports";
 import Users from "@/pages/Users";
 import Drivers from "@/pages/Drivers";
 import Vehicles from "@/pages/Vehicles";
+import RoleTesting from "@/pages/RoleTesting";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -45,6 +46,7 @@ function Router() {
           <Route path="/users" component={Users} />
           <Route path="/drivers" component={Drivers} />
           <Route path="/vehicles" component={Vehicles} />
+          <Route path="/role-testing" component={RoleTesting} />
         </>
       )}
       <Route component={NotFound} />
