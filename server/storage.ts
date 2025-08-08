@@ -142,7 +142,11 @@ export class DatabaseStorage implements IStorage {
       .where(eq(bookings.userId, userId))
       .orderBy(desc(bookings.submissionDate));
       
-    return results.map(r => r.bookings);
+    return results.map(r => ({
+      ...r.bookings,
+      driver: r.drivers,
+      vehicle: r.vehicles
+    }));
   }
 
   async getAllBookings(filters?: any): Promise<{ bookings: Booking[]; total: number }> {

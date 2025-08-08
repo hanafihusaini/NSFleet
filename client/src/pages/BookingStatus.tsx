@@ -49,7 +49,7 @@ export default function BookingStatus() {
   // Handle both response formats: direct array (for users) or object with bookings property (for admins)
   const userBookings = Array.isArray(userBookingsResponse) 
     ? userBookingsResponse 
-    : userBookingsResponse?.bookings || [];
+    : (userBookingsResponse as any)?.bookings || [];
 
   const filteredBookings = userBookings.filter((booking: any) => 
     !statusFilter || statusFilter === 'all' || booking.status === statusFilter

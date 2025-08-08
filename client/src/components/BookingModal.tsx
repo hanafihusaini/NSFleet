@@ -182,26 +182,40 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
             {booking.status === 'approved' && (booking.driver || booking.vehicle) && (
               <div className="mt-6 p-4 bg-green-50 rounded-lg">
                 <h5 className="font-medium text-green-800 mb-3">Maklumat Kenderaan & Pemandu</h5>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {booking.driver && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Nama Pemandu:</label>
-                      <p className="text-sm text-gray-800">{booking.driver.name}</p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Nama Pemandu:</label>
+                        <p className="text-sm text-gray-800">{booking.driver.name}</p>
+                      </div>
+                      {booking.driver.phone && (
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">Telefon Pemandu:</label>
+                          <p className="text-sm text-gray-800">{booking.driver.phone}</p>
+                        </div>
+                      )}
                     </div>
                   )}
                   {booking.vehicle && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">No. Kenderaan:</label>
-                      <p className="text-sm text-gray-800">{booking.vehicle.model} - {booking.vehicle.plateNumber}</p>
-                    </div>
-                  )}
-                  {booking.driverInstruction && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Arahan kepada Pemandu:</label>
-                      <p className="text-sm text-gray-800">{booking.driverInstruction}</p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Model Kenderaan:</label>
+                        <p className="text-sm text-gray-800">{booking.vehicle.model}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">No. Plat:</label>
+                        <p className="text-sm text-gray-800 font-mono">{booking.vehicle.plateNumber}</p>
+                      </div>
                     </div>
                   )}
                 </div>
+                {booking.driverInstruction && (
+                  <div className="mt-4">
+                    <label className="text-sm font-medium text-gray-600">Arahan kepada Pemandu:</label>
+                    <p className="text-sm text-gray-800">{booking.driverInstruction}</p>
+                  </div>
+                )}
               </div>
             )}
 
