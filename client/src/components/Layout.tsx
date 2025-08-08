@@ -12,12 +12,12 @@ interface LayoutProps {
 
 export function Layout({ children, title }: LayoutProps) {
   const [location] = useLocation();
-  const { user } = useAuth() as { user?: any };
+  const { user, logout, isLoggingOut } = useAuth() as { user?: any; logout: () => void; isLoggingOut: boolean };
   const [showManagementDropdown, setShowManagementDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    logout();
   };
 
   // Close dropdown when clicking outside

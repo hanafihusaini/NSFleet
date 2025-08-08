@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { insertBookingSchema, insertDriverSchema, insertVehicleSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -13,7 +13,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const handleError = (error: any, req: any, res: any) => {
     console.error("API Error:", error);
     storage.logError({
-      userId: req.user?.claims?.sub,
+      userId: req.user?.id,
       errorType: error.name || 'UnknownError',
       errorMessage: error.message,
       stackTrace: error.stack,
@@ -24,27 +24,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(500).json({ message: error.message || "Internal Server Error" });
   };
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      
-      // Update user session with database role
-      if (user && req.user.claims) {
-        req.user.claims.role = user.role;
-      }
-      
-      res.json(user);
-    } catch (error) {
-      handleError(error, req, res);
-    }
-  });
+  // Auth route is now handled in auth.ts setupAuth function
 
   // User management routes
   app.get('/api/users', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -61,7 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/users/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const requestingUserId = req.user.claims.sub;
+      const requestingUserId = req.user.id;
       
       // Get requesting user role from database
       const requestingUser = await storage.getUser(requestingUserId);
@@ -82,7 +67,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Booking routes
   app.post('/api/bookings', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const bookingData = insertBookingSchema.parse({
         ...req.body,
         userId,
@@ -116,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bookings', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -165,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/bookings/:id/process', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database to ensure it's current
       const user = await storage.getUser(userId);
@@ -235,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/bookings/:id/modify', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -296,7 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/bookings/:id/cancel', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const bookingId = req.params.id;
       
       const existingBooking = await storage.getBooking(bookingId);
@@ -356,7 +341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/drivers', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -377,7 +362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/drivers/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -399,7 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/drivers/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -427,7 +412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/vehicles', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -448,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/vehicles/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -470,7 +455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/vehicles/:id', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
@@ -504,7 +489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Error logs route (admin only)
   app.get('/api/errors', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       
       // Get user role from database
       const user = await storage.getUser(userId);
