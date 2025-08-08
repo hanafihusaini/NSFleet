@@ -11,7 +11,7 @@ import BookingStatus from "@/pages/BookingStatus";
 import Applications from "@/pages/Applications";
 import Calendar from "@/pages/Calendar";
 import Reports from "@/pages/Reports";
-import UserManagement from "@/pages/UserManagement";
+import Users from "@/pages/Users";
 import Drivers from "@/pages/Drivers";
 import Vehicles from "@/pages/Vehicles";
 import NotFound from "@/pages/not-found";
@@ -42,7 +42,7 @@ function Router() {
           <Route path="/applications" component={Applications} />
           <Route path="/calendar" component={Calendar} />
           <Route path="/reports" component={Reports} />
-          <Route path="/users" component={UserManagement} />
+          <Route path="/users" component={Users} />
           <Route path="/drivers" component={Drivers} />
           <Route path="/vehicles" component={Vehicles} />
         </>
