@@ -44,6 +44,7 @@ export const users = pgTable("users", {
 export const drivers = pgTable("drivers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
+  phone: varchar("phone"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });

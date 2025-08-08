@@ -21,6 +21,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 
 const driverSchema = z.object({
   name: z.string().min(1, "Nama pemandu diperlukan"),
+  phone: z.string().optional(),
 });
 
 type DriverFormData = z.infer<typeof driverSchema>;
@@ -36,6 +37,7 @@ export default function Drivers() {
     resolver: zodResolver(driverSchema),
     defaultValues: {
       name: '',
+      phone: '',
     },
   });
 
@@ -136,6 +138,7 @@ export default function Drivers() {
   const handleEdit = (driver: any) => {
     setEditingDriver(driver);
     form.setValue('name', driver.name);
+    form.setValue('phone', driver.phone || '');
     setIsDialogOpen(true);
   };
 
@@ -191,6 +194,20 @@ export default function Drivers() {
                       )}
                     />
 
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Telefon</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Nombor telefon pemandu" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <div className="flex justify-end space-x-2">
                       <Button
                         type="button"
@@ -229,6 +246,7 @@ export default function Drivers() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nama Pemandu</TableHead>
+                    <TableHead>Telefon</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Tarikh Ditambah</TableHead>
                     <TableHead className="w-32">Tindakan</TableHead>
@@ -238,6 +256,7 @@ export default function Drivers() {
                   {drivers.map((driver: any) => (
                     <TableRow key={driver.id}>
                       <TableCell className="font-medium">{driver.name}</TableCell>
+                      <TableCell className="text-sm">{driver.phone || '-'}</TableCell>
                       <TableCell>
                         <Badge variant={driver.isActive ? "default" : "secondary"}>
                           {driver.isActive ? "Aktif" : "Tidak Aktif"}
