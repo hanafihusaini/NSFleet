@@ -68,11 +68,19 @@ export default function BookingStatus() {
       return false;
     }
     
-    // Date filter
+    // Date filter - check if search date falls within booking date range
     if (filters.departureDate) {
-      const bookingDate = new Date(booking.departureDate).toDateString();
-      const filterDate = new Date(filters.departureDate).toDateString();
-      if (bookingDate !== filterDate) {
+      const filterDate = new Date(filters.departureDate);
+      const bookingDepartureDate = new Date(booking.departureDate);
+      const bookingReturnDate = new Date(booking.returnDate);
+      
+      // Remove time component for accurate date comparison
+      filterDate.setHours(0, 0, 0, 0);
+      bookingDepartureDate.setHours(0, 0, 0, 0);
+      bookingReturnDate.setHours(0, 0, 0, 0);
+      
+      // Check if search date falls within the booking date range (inclusive)
+      if (filterDate < bookingDepartureDate || filterDate > bookingReturnDate) {
         return false;
       }
     }
