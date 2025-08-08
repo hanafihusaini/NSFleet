@@ -17,6 +17,7 @@ import { z } from "zod";
 import { Plus, Edit, Trash2, Car } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { formatDate } from "@/lib/utils";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 const vehicleSchema = z.object({
   model: z.string().min(1, "Model kenderaan diperlukan"),
@@ -79,6 +80,17 @@ export default function Vehicles() {
       form.reset();
     },
     onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda telah log keluar. Log masuk semula...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Ralat",
         description: error.message || "Gagal menyimpan data kenderaan",
@@ -100,6 +112,17 @@ export default function Vehicles() {
       });
     },
     onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda telah log keluar. Log masuk semula...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Ralat",
         description: error.message || "Gagal memadam kenderaan",

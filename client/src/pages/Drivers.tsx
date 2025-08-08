@@ -17,6 +17,7 @@ import { z } from "zod";
 import { Plus, Edit, Trash2, User as UserIcon } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { formatDate } from "@/lib/utils";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 const driverSchema = z.object({
   name: z.string().min(1, "Nama pemandu diperlukan"),
@@ -77,6 +78,17 @@ export default function Drivers() {
       form.reset();
     },
     onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda telah log keluar. Log masuk semula...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Ralat",
         description: error.message || "Gagal menyimpan data pemandu",
@@ -98,6 +110,17 @@ export default function Drivers() {
       });
     },
     onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda telah log keluar. Log masuk semula...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Ralat",
         description: error.message || "Gagal memadam pemandu",
