@@ -42,8 +42,8 @@ class SendGridProvider implements EmailProvider {
         to: params.to,
         from: params.from,
         subject: params.subject,
-        text: params.text,
-        html: params.html,
+        text: params.text || '',
+        html: params.html || '',
       });
       return true;
     } catch (error) {
