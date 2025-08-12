@@ -69,6 +69,7 @@ export const bookings = pgTable("bookings", {
   bookingId: varchar("booking_id").notNull().unique(), // YY + 3-digit sequence
   userId: varchar("user_id").notNull().references(() => users.id),
   applicantName: varchar("applicant_name").notNull(),
+  applicantEmail: varchar("applicant_email"),
   applicantUnit: varchar("applicant_unit").notNull(),
   departureDate: timestamp("departure_date").notNull(),
   returnDate: timestamp("return_date").notNull(),

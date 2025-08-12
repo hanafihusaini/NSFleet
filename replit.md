@@ -52,7 +52,7 @@ Preferred communication style: Simple, everyday language.
 
 - **Database Hosting**: Neon PostgreSQL serverless platform
 - **Authentication**: Replit Auth service for user authentication
-- **Email Notifications**: Configured for booking confirmations (implementation pending)
+- **Email Notifications**: Flexible email service supporting SendGrid and MyGovCloud Mail API with automated booking confirmations, approvals, and rejections
 - **UI Components**: Radix UI primitives for accessible component foundation
 - **Date Handling**: date-fns library for date manipulation and formatting
 - **Validation**: Zod for runtime type checking and schema validation

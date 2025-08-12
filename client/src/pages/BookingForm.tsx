@@ -18,6 +18,7 @@ import { z } from "zod";
 
 const bookingSchema = z.object({
   applicantName: z.string().min(1, "Nama pemohon diperlukan"),
+  applicantEmail: z.string().email("Format email tidak sah").min(1, "Email pemohon diperlukan"),
   applicantUnit: z.string().min(1, "Unit pemohon diperlukan"),
   departureDate: z.string().min(1, "Tarikh berlepas diperlukan"),
   departureTime: z.string().min(1, "Masa berlepas diperlukan"),
@@ -40,6 +41,7 @@ export default function BookingForm() {
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       applicantName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '',
+      applicantEmail: user?.email || '',
       applicantUnit: user?.unit || '',
       passengerName: '',
       destination: '',
@@ -56,6 +58,7 @@ export default function BookingForm() {
 
       const bookingData = {
         applicantName: data.applicantName,
+        applicantEmail: data.applicantEmail,
         applicantUnit: data.applicantUnit,
         departureDate: departureDateTime,
         returnDate: returnDateTime,
@@ -142,6 +145,20 @@ export default function BookingForm() {
                           <FormLabel>Nama Pemohon *</FormLabel>
                           <FormControl>
                             <Input {...field} placeholder="Nama penuh pemohon" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="applicantEmail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email *</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="email" placeholder="Email pemohon" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

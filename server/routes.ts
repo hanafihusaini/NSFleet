@@ -4,10 +4,19 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import { insertBookingSchema, insertDriverSchema, insertVehicleSchema } from "@shared/schema";
 import { z } from "zod";
+import { EmailService } from './emailService.js';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+
+  // Initialize email service
+  let emailService: EmailService | null = null;
+  try {
+    emailService = new EmailService();
+  } catch (error) {
+    console.log('Email service not available:', (error as Error).message);
+  }
 
   // Error handling middleware
   const handleError = (error: any, req: any, res: any) => {
@@ -89,6 +98,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newValues: booking,
         oldValues: null,
       });
+
+      // Send confirmation email
+      if (emailService && booking.applicantEmail) {
+        try {
+          await emailService.sendBookingConfirmation({
+            bookingId: booking.bookingId,
+            applicantName: booking.applicantName,
+            applicantEmail: booking.applicantEmail,
+            destination: booking.destination,
+            bookingDate: new Date(booking.departureDate).toLocaleDateString('ms-MY'),
+            returnDate: new Date(booking.returnDate).toLocaleDateString('ms-MY'),
+          });
+        } catch (emailError) {
+          console.error('Failed to send confirmation email:', emailError);
+          // Don't fail the booking creation if email fails
+        }
+      }
 
       res.json(booking);
     } catch (error) {
@@ -211,6 +237,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         oldValues: existingBooking,
         newValues: updatedBooking,
       });
+
+      // Send status update email
+      if (emailService && updatedBooking.applicantEmail) {
+        try {
+          const emailData = {
+            bookingId: updatedBooking.bookingId,
+            applicantName: updatedBooking.applicantName,
+            applicantEmail: updatedBooking.applicantEmail,
+            destination: updatedBooking.destination,
+            bookingDate: new Date(updatedBooking.departureDate).toLocaleDateString('ms-MY'),
+            returnDate: new Date(updatedBooking.returnDate).toLocaleDateString('ms-MY'),
+            reason: rejectionReason,
+            processedBy: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
+          };
+
+          if (status === 'approved') {
+            await emailService.sendBookingApproval(emailData);
+          } else if (status === 'rejected') {
+            await emailService.sendBookingRejection(emailData);
+          }
+        } catch (emailError) {
+          console.error('Failed to send status update email:', emailError);
+          // Don't fail the booking update if email fails
+        }
+      }
 
       res.json(updatedBooking);
     } catch (error) {
