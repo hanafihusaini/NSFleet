@@ -117,15 +117,15 @@ export function Layout({ children, title }: LayoutProps) {
                   const Icon = item.icon;
                   return (
                     <Link key={item.path} href={item.path}>
-                      <a className={cn(
-                        "px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2",
+                      <div className={cn(
+                        "px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 cursor-pointer",
                         location === item.path
                           ? "text-white bg-gov-dark"
                           : "text-blue-200 hover:text-white hover:bg-gov-dark"
                       )}>
                         <Icon className="h-4 w-4" />
                         {item.label}
-                      </a>
+                      </div>
                     </Link>
                   );
                 })}
@@ -153,10 +153,10 @@ export function Layout({ children, title }: LayoutProps) {
                             const Icon = item.icon;
                             return (
                               <Link key={item.path} href={item.path}>
-                                <a 
+                                <div 
                                   onClick={() => setShowManagementDropdown(false)}
                                   className={cn(
-                                    "flex items-center gap-3 px-4 py-2 text-sm hover:bg-gray-100",
+                                    "flex items-center gap-3 px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer",
                                     location === item.path
                                       ? "text-gov-blue font-medium bg-blue-50"
                                       : "text-gray-700"
@@ -164,7 +164,7 @@ export function Layout({ children, title }: LayoutProps) {
                                 >
                                   <Icon className="h-4 w-4" />
                                   {item.label}
-                                </a>
+                                </div>
                               </Link>
                             );
                           })}
