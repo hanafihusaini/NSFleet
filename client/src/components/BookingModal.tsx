@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { FileText, User as UserIcon, Calendar, MapPin, Target, StickyNote, Clock, Printer } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, calculateWorkingDays } from "@/lib/utils";
 
 interface BookingModalProps {
   booking: any;
@@ -40,14 +40,13 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
       ? new Date(booking.processedDate)
       : booking.modifiedDate 
         ? new Date(booking.modifiedDate)
-        : new Date();
+        : new Date(); // For pending bookings, use current date
 
-    const diffTime = Math.abs(endDate.getTime() - submissionDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const workingDays = calculateWorkingDays(submissionDate, endDate);
     
     return {
-      days: diffDays,
-      isOverdue: diffDays > 3,
+      days: workingDays,
+      isOverdue: workingDays > 3,
     };
   };
 

@@ -15,7 +15,7 @@ import { Eye, ServerCog, Edit, Calendar, BarChart3, ChevronLeft, ChevronRight, S
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, calculateWorkingDays } from "@/lib/utils";
 
 export default function Applications() {
   const [, setLocation] = useLocation();
@@ -106,14 +106,13 @@ export default function Applications() {
       ? new Date(booking.processedDate)
       : booking.modifiedDate 
         ? new Date(booking.modifiedDate)
-        : new Date();
+        : new Date(); // For pending bookings, use current date
 
-    const diffTime = Math.abs(endDate.getTime() - submissionDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const workingDays = calculateWorkingDays(submissionDate, endDate);
     
     return {
-      days: diffDays,
-      isOverdue: diffDays > 3,
+      days: workingDays,
+      isOverdue: workingDays > 3,
     };
   };
 
@@ -297,7 +296,7 @@ export default function Applications() {
                               "font-medium",
                               processingTime.isOverdue ? "text-red-500" : "text-gray-600"
                             )}>
-                              {processingTime.days} hari
+                              {processingTime.days} hari kerja
                             </span>
                           </TableCell>
                           <TableCell>
