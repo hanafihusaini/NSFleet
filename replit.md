@@ -46,7 +46,7 @@ Preferred communication style: Simple, everyday language.
 - **Date Validation**: Future-only booking dates with business day calculations
 - **Conflict Detection**: Prevents double-booking of drivers and vehicles
 - **Status Workflow**: Pending → Approved/Rejected with modification capabilities
-- **Processing Metrics**: Automatic calculation of processing time in working days
+- **Processing Metrics**: Automatic calculation of processing time in working days (excluding weekends and Malaysian federal public holidays for Negeri Sembilan), with submission day counted as Day 0
 
 ## External Dependencies
 

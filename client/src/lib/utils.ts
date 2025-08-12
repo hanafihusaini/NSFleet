@@ -23,14 +23,63 @@ export function formatDateTime(date: string | Date): string {
   });
 }
 
-export function calculateWorkingDays(startDate: Date, endDate: Date): number {
-  let workingDays = 0;
-  const currentDate = new Date(startDate);
+// Malaysian Federal Public Holidays for Negeri Sembilan
+const getPublicHolidays = (year: number): Date[] => {
+  const holidays: Date[] = [];
   
-  while (currentDate <= endDate) {
+  // Fixed annual holidays
+  holidays.push(new Date(year, 0, 1));   // New Year's Day
+  holidays.push(new Date(year, 1, 1));   // Federal Territory Day (some states)
+  holidays.push(new Date(year, 4, 1));   // Labour Day
+  holidays.push(new Date(year, 7, 31));  // Merdeka Day
+  holidays.push(new Date(year, 8, 16));  // Malaysia Day
+  holidays.push(new Date(year, 11, 25)); // Christmas Day
+  
+  // Religious holidays (approximate - these change annually)
+  // For production, these should be fetched from an API or updated annually
+  if (year === 2025) {
+    holidays.push(new Date(2025, 0, 29));  // Chinese New Year
+    holidays.push(new Date(2025, 0, 30));  // Chinese New Year (2nd day)
+    holidays.push(new Date(2025, 2, 30));  // Hari Raya Haji (estimated)
+    holidays.push(new Date(2025, 2, 31));  // Awal Muharram (estimated)
+    holidays.push(new Date(2025, 4, 12));  // Wesak Day (estimated)
+    holidays.push(new Date(2025, 4, 30));  // Hari Raya Aidilfitri (estimated)
+    holidays.push(new Date(2025, 5, 1));   // Hari Raya Aidilfitri (2nd day)
+    holidays.push(new Date(2025, 8, 7));   // Prophet Muhammad's Birthday (estimated)
+    holidays.push(new Date(2025, 9, 31));  // Deepavali (estimated)
+    
+    // Negeri Sembilan specific holidays
+    holidays.push(new Date(2025, 0, 14));  // Yang di-Pertuan Besar Negeri Sembilan's Birthday
+  }
+  
+  return holidays;
+};
+
+const isPublicHoliday = (date: Date): boolean => {
+  const holidays = getPublicHolidays(date.getFullYear());
+  return holidays.some(holiday => 
+    holiday.getFullYear() === date.getFullYear() &&
+    holiday.getMonth() === date.getMonth() &&
+    holiday.getDate() === date.getDate()
+  );
+};
+
+export function calculateWorkingDays(startDate: Date, endDate: Date): number {
+  // Normalize dates to start of day to ignore time
+  const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  
+  // Start counting from the day AFTER submission (submission day is Day 0)
+  const countFrom = new Date(start);
+  countFrom.setDate(countFrom.getDate() + 1);
+  
+  let workingDays = 0;
+  const currentDate = new Date(countFrom);
+  
+  while (currentDate <= end) {
     const dayOfWeek = currentDate.getDay();
-    // Skip weekends (Saturday = 6, Sunday = 0)
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+    // Count only weekdays (Monday-Friday) that are not public holidays
+    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !isPublicHoliday(currentDate)) {
       workingDays++;
     }
     currentDate.setDate(currentDate.getDate() + 1);
