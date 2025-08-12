@@ -40,13 +40,17 @@ export default function BookingForm() {
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      applicantName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '',
+      applicantName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || '' : '',
       applicantEmail: user?.email || '',
       applicantUnit: user?.unit || '',
       passengerName: '',
       destination: '',
       purpose: '',
       notes: '',
+      departureDate: '',
+      departureTime: '',
+      returnDate: '',
+      returnTime: '',
     },
   });
 

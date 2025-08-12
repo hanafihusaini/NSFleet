@@ -45,9 +45,16 @@ class SendGridProvider implements EmailProvider {
         text: params.text || '',
         html: params.html || '',
       });
+      console.log(`Email sent successfully to ${params.to}`);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('SendGrid email error:', error);
+      if (error.response?.body?.errors) {
+        console.error('SendGrid error details:', error.response.body.errors);
+        if (error.code === 403) {
+          console.error('Email sending failed: Sender email not verified. Please verify your sender email in SendGrid console.');
+        }
+      }
       return false;
     }
   }
@@ -264,8 +271,8 @@ export class EmailService {
       throw new Error('No email provider configured');
     }
 
-    // Default sender email - can be configured via environment variable
-    this.fromEmail = process.env.FROM_EMAIL || 'noreply@janm.gov.my';
+    // Default sender email - use a verified SendGrid sender email
+    this.fromEmail = process.env.FROM_EMAIL || 'noreply@example.com';
   }
 
   async sendBookingConfirmation(data: BookingEmailData): Promise<boolean> {
