@@ -418,6 +418,36 @@ export default function Calendar() {
                 </div>
               </div>
 
+              {/* Vehicle Information for Approved Bookings */}
+              {selectedBooking.status === 'approved' && (selectedBooking.driver || selectedBooking.vehicle || selectedBooking.driverName) && (
+                <div>
+                  <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <Car className="h-4 w-4" />
+                    Maklumat Kenderaan
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">Nama Pemandu:</span>
+                        <p className="font-medium">{selectedBooking.driverName || selectedBooking.driver?.name || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">No. Kenderaan:</span>
+                        <p className="font-medium">{selectedBooking.vehiclePlateNumber || selectedBooking.vehicle?.plateNumber || '-'}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3 text-sm">
+                      {selectedBooking.driverInstruction && (
+                        <div>
+                          <span className="text-gray-600">Arahan Kepada Pemandu:</span>
+                          <p className="font-medium">{selectedBooking.driverInstruction}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Processing Information */}
               <div>
                 <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">

@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { FileText, User as UserIcon, Calendar, MapPin, Target, StickyNote, Clock, Printer } from "lucide-react";
+import { FileText, User as UserIcon, Calendar, MapPin, Target, StickyNote, Clock, Printer, Car } from "lucide-react";
 import { cn, calculateWorkingDays } from "@/lib/utils";
 
 interface BookingModalProps {
@@ -108,13 +108,15 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
                 <div>
                   <label className="text-sm font-medium text-gray-600">Tarikh & Masa Pergi:</label>
                   <p className="text-sm text-gray-800">
-                    {format(new Date(booking.departureDate), 'dd/MM/yyyy - HH:mm')}
+                    {new Date(booking.departureDate).toLocaleDateString('ms-MY')}
+                    {booking.departureTime ? ` - ${booking.departureTime}` : ''}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Tarikh & Masa Balik:</label>
                   <p className="text-sm text-gray-800">
-                    {format(new Date(booking.returnDate), 'dd/MM/yyyy - HH:mm')}
+                    {new Date(booking.returnDate).toLocaleDateString('ms-MY')}
+                    {booking.returnTime ? ` - ${booking.returnTime}` : ''}
                   </p>
                 </div>
                 <div>
@@ -177,44 +179,33 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
               </div>
             </div>
 
-            {/* Driver and Vehicle Information (if approved) */}
-            {booking.status === 'approved' && (booking.driver || booking.vehicle) && (
-              <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                <h5 className="font-medium text-green-800 mb-3">Maklumat Kenderaan & Pemandu</h5>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {booking.driver && (
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Nama Pemandu:</label>
-                        <p className="text-sm text-gray-800">{booking.driver.name}</p>
-                      </div>
-                      {booking.driver.phone && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Telefon Pemandu:</label>
-                          <p className="text-sm text-gray-800">{booking.driver.phone}</p>
-                        </div>
-                      )}
+            {/* Vehicle Information for Approved Bookings */}
+            {booking.status === 'approved' && (booking.driver || booking.vehicle || booking.driverName) && (
+              <div className="mt-6 border-t border-gray-200 pt-6">
+                <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Car className="h-4 w-4" />
+                  Maklumat Kenderaan
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Nama Pemandu:</label>
+                      <p className="text-sm text-gray-800">{booking.driverName || booking.driver?.name || '-'}</p>
                     </div>
-                  )}
-                  {booking.vehicle && (
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Model Kenderaan:</label>
-                        <p className="text-sm text-gray-800">{booking.vehicle.model}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">No. Plat:</label>
-                        <p className="text-sm text-gray-800 font-mono">{booking.vehicle.plateNumber}</p>
-                      </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">No. Kenderaan:</label>
+                      <p className="text-sm text-gray-800 font-mono">{booking.vehiclePlateNumber || booking.vehicle?.plateNumber || '-'}</p>
                     </div>
-                  )}
-                </div>
-                {booking.driverInstruction && (
-                  <div className="mt-4">
-                    <label className="text-sm font-medium text-gray-600">Arahan kepada Pemandu:</label>
-                    <p className="text-sm text-gray-800">{booking.driverInstruction}</p>
                   </div>
-                )}
+                  <div className="space-y-3">
+                    {booking.driverInstruction && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-600">Arahan Kepada Pemandu:</label>
+                        <p className="text-sm text-gray-800">{booking.driverInstruction}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
