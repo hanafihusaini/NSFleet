@@ -151,7 +151,10 @@ export class DatabaseStorage implements IStorage {
     return results.map(r => ({
       ...r.bookings,
       driver: r.drivers,
-      vehicle: r.vehicles
+      vehicle: r.vehicles,
+      driverName: r.drivers?.name || null,
+      vehicleModel: r.vehicles?.model || null,
+      vehiclePlateNumber: r.vehicles?.plateNumber || null
     }));
   }
 
@@ -259,6 +262,8 @@ export class DatabaseStorage implements IStorage {
         ...r.booking,
         driverName: r.driver?.name || null,
         vehicleInfo: r.vehicle ? `${r.vehicle.model} (${r.vehicle.plateNumber})` : null,
+        vehicleModel: r.vehicle?.model || null,
+        vehiclePlateNumber: r.vehicle?.plateNumber || null,
         unit: r.booking.applicantUnit,
         phoneNumber: r.user?.phone || null,
         email: r.booking.applicantEmail || r.user?.email || null,
