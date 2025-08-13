@@ -203,28 +203,25 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Build the queries with conditions
+    // Build the queries with conditions  
     const baseQuery = db
-      .select()
+      .select({
+        booking: bookings,
+        user: users,
+        driver: drivers,
+        vehicle: vehicles
+      })
       .from(bookings)
       .leftJoin(users, eq(bookings.userId, users.id))
       .leftJoin(drivers, eq(bookings.driverId, drivers.id))
-      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id))
-      .leftJoin(
-        { processedByUser: users },
-        eq(bookings.processedBy, sql`${users.id}`)
-      );
+      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id));
 
     const baseCountQuery = db
       .select({ count: count() })
       .from(bookings)
       .leftJoin(users, eq(bookings.userId, users.id))
       .leftJoin(drivers, eq(bookings.driverId, drivers.id))
-      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id))
-      .leftJoin(
-        { processedByUser: users },
-        eq(bookings.processedBy, sql`${users.id}`)
-      );
+      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id));
 
     // Apply conditions if any
     const query = conditions.length > 0 
@@ -248,15 +245,24 @@ export class DatabaseStorage implements IStorage {
       .limit(filters?.limit || 10)
       .offset(filters?.offset || 0);
 
+    // Get processed by user info for each booking
+    const processedByUserIds = [...new Set(results.map(r => r.booking.processedBy).filter(Boolean))];
+    const processedByUsers = processedByUserIds.length > 0 ? await db
+      .select()
+      .from(users)
+      .where(sql`${users.id} IN (${processedByUserIds.map(id => `'${id}'`).join(',')})`) : [];
+
+    const processedByUserMap = new Map(processedByUsers.map(u => [u.id, u]));
+
     return {
       bookings: results.map(r => ({
-        ...r.bookings,
-        driverName: r.drivers?.name || null,
-        vehicleInfo: r.vehicles ? `${r.vehicles.model} (${r.vehicles.plateNumber})` : null,
-        unit: r.bookings.applicantUnit,
-        phoneNumber: r.users?.phone || null,
-        email: r.bookings.applicantEmail || r.users?.email || null,
-        processedByName: r.processedByUser?.username || null
+        ...r.booking,
+        driverName: r.driver?.name || null,
+        vehicleInfo: r.vehicle ? `${r.vehicle.model} (${r.vehicle.plateNumber})` : null,
+        unit: r.booking.applicantUnit,
+        phoneNumber: r.user?.phone || null,
+        email: r.booking.applicantEmail || r.user?.email || null,
+        processedByName: r.booking.processedBy ? processedByUserMap.get(r.booking.processedBy)?.username : null
       })),
       total
     };
