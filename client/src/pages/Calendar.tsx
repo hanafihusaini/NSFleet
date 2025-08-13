@@ -71,7 +71,7 @@ export default function Calendar() {
   const [showProcessModal, setShowProcessModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
-  const { data: bookings = [] } = useQuery<any[]>({
+  const { data: bookingsData } = useQuery<any>({
     queryKey: ['/api/bookings'],
     enabled: !!user
   });
@@ -80,6 +80,9 @@ export default function Calendar() {
     queryKey: ['/api/vehicles'],
     enabled: !!user
   });
+
+  // Handle both array and object response formats
+  const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData?.bookings || []);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
