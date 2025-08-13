@@ -17,8 +17,15 @@ export interface BookingEmailData {
   applicantName: string;
   applicantEmail: string;
   destination: string;
+  purpose?: string;
   bookingDate: string;
+  bookingTime?: string;
   returnDate: string;
+  returnTime?: string;
+  driverName?: string;
+  driverPhone?: string;
+  vehicleModel?: string;
+  vehiclePlateNumber?: string;
   reason?: string;
   adminNotes?: string;
   processedBy?: string;
@@ -137,15 +144,27 @@ const getBookingApprovalTemplate = (data: BookingEmailData) => ({
   text: `
 Permohonan kenderaan anda telah DILULUSKAN.
 
+Maklumat Permohonan:
+
 ID Tempahan: ${data.bookingId}
 Nama Pemohon: ${data.applicantName}
 Destinasi: ${data.destination}
-Tarikh Perjalanan: ${data.bookingDate}
-Tarikh Pulang: ${data.returnDate}
+Tujuan: ${data.purpose || '-'}
+Tarikh & Masa Pergi: ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}
+Tarikh & Masa Balik: ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}
+
+${data.driverName || data.vehicleModel || data.vehiclePlateNumber ? `
+Maklumat Kenderaan:
+${data.driverName ? `Nama Pemandu: ${data.driverName}` : ''}
+${data.vehicleModel && data.vehiclePlateNumber ? `No. Kenderaan: ${data.vehicleModel} - ${data.vehiclePlateNumber}` : ''}
+${data.driverPhone ? `Contact Pemandu: ${data.driverPhone}` : ''}
+` : ''}
+
+Status: Diluluskan
 
 ${data.adminNotes ? `Catatan: ${data.adminNotes}` : ''}
 
-Sila hubungi pihak pengurusan kenderaan untuk maklumat lanjut mengenai pengambilan kenderaan.
+Sila hubungi Unit Pentadbiran atau Pemandu untuk maklumat lanjut.
 
 Diluluskan oleh: ${data.processedBy || 'Admin'}
 
@@ -162,9 +181,19 @@ Negeri Sembilan
         <p><strong>ID Tempahan:</strong> ${data.bookingId}</p>
         <p><strong>Nama Pemohon:</strong> ${data.applicantName}</p>
         <p><strong>Destinasi:</strong> ${data.destination}</p>
-        <p><strong>Tarikh Perjalanan:</strong> ${data.bookingDate}</p>
-        <p><strong>Tarikh Pulang:</strong> ${data.returnDate}</p>
+        <p><strong>Tujuan:</strong> ${data.purpose || '-'}</p>
+        <p><strong>Tarikh & Masa Pergi:</strong> ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}</p>
+        <p><strong>Tarikh & Masa Balik:</strong> ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}</p>
       </div>
+
+      ${data.driverName || data.vehicleModel || data.vehiclePlateNumber ? `
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="margin-top: 0; color: #0ea5e9;">Maklumat Kenderaan:</h3>
+          ${data.driverName ? `<p><strong>Nama Pemandu:</strong> ${data.driverName}</p>` : ''}
+          ${data.vehicleModel && data.vehiclePlateNumber ? `<p><strong>No. Kenderaan:</strong> ${data.vehicleModel} - ${data.vehiclePlateNumber}</p>` : ''}
+          ${data.driverPhone ? `<p><strong>Contact Pemandu:</strong> ${data.driverPhone}</p>` : ''}
+        </div>
+      ` : ''}
       
       <div style="background-color: #d1fae5; padding: 15px; border-radius: 8px; border-left: 4px solid #059669;">
         <p style="margin: 0;"><strong>Status:</strong> Diluluskan</p>
@@ -177,7 +206,7 @@ Negeri Sembilan
         </div>
       ` : ''}
       
-      <p>Sila hubungi pihak pengurusan kenderaan untuk maklumat lanjut mengenai pengambilan kenderaan.</p>
+      <p>Sila hubungi Unit Pentadbiran atau Pemandu untuk maklumat lanjut.</p>
       
       <p style="color: #6b7280;"><em>Diluluskan oleh: ${data.processedBy || 'Admin'}</em></p>
       

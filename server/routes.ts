@@ -241,14 +241,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send status update email
       if (emailService && updatedBooking.applicantEmail) {
         try {
+          // Get driver and vehicle info for approved bookings
+          let driverInfo = null;
+          let vehicleInfo = null;
+          
+          if (status === 'approved' && driverId) {
+            try {
+              const drivers = await storage.getAllDrivers();
+              driverInfo = drivers.find(d => d.id === driverId);
+            } catch (error) {
+              console.error('Failed to fetch driver info:', error);
+            }
+          }
+          
+          if (status === 'approved' && vehicleId) {
+            try {
+              const vehicles = await storage.getAllVehicles();
+              vehicleInfo = vehicles.find(v => v.id === vehicleId);
+            } catch (error) {
+              console.error('Failed to fetch vehicle info:', error);
+            }
+          }
+
           const emailData = {
             bookingId: updatedBooking.bookingId,
             applicantName: updatedBooking.applicantName,
             applicantEmail: updatedBooking.applicantEmail,
             destination: updatedBooking.destination,
+            purpose: updatedBooking.purpose,
             bookingDate: new Date(updatedBooking.departureDate).toLocaleDateString('ms-MY'),
+            bookingTime: updatedBooking.departureTime,
             returnDate: new Date(updatedBooking.returnDate).toLocaleDateString('ms-MY'),
+            returnTime: updatedBooking.returnTime,
+            driverName: driverInfo?.name,
+            driverPhone: driverInfo?.phone,
+            vehicleModel: vehicleInfo?.model,
+            vehiclePlateNumber: vehicleInfo?.plateNumber,
             reason: rejectionReason,
+            adminNotes: adminNotes,
             processedBy: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
           };
 
