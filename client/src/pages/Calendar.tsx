@@ -40,11 +40,20 @@ const publicHolidays = [
   { date: "2025-09-05", name: "Maulidur Rasul (Est.)" },
 ];
 
-// Vehicle colors - specific mapping
-const getVehicleColor = (plateNumber: string) => {
-  if (plateNumber?.toLowerCase().includes('fortuner')) return '#000000'; // black
-  if (plateNumber?.toLowerCase().includes('xtrail')) return '#6b7280'; // grey
-  if (plateNumber?.toLowerCase().includes('aruz')) return '#8b5cf6'; // purple
+// Vehicle colors - specific mapping by model name
+const getVehicleColor = (model: string, plateNumber: string) => {
+  const modelLower = model?.toLowerCase() || '';
+  const plateLower = plateNumber?.toLowerCase() || '';
+  
+  if (modelLower.includes('fortuner')) return '#000000'; // black
+  if (modelLower.includes('x-trail') || modelLower.includes('xtrail')) return '#6b7280'; // grey  
+  if (modelLower.includes('aruz')) return '#8b5cf6'; // purple
+  
+  // Fallback to plate number check
+  if (plateLower.includes('fortuner')) return '#000000';
+  if (plateLower.includes('xtrail')) return '#6b7280';
+  if (plateLower.includes('aruz')) return '#8b5cf6';
+  
   return '#3b82f6'; // default blue
 };
 
@@ -86,7 +95,7 @@ export default function Calendar() {
   const vehicleColorMap = useMemo(() => {
     const map: { [key: string]: string } = {};
     vehicles.forEach((vehicle: any) => {
-      map[vehicle.id] = getVehicleColor(vehicle.plateNumber);
+      map[vehicle.id] = getVehicleColor(vehicle.model, vehicle.plateNumber);
     });
     return map;
   }, [vehicles]);
@@ -111,7 +120,7 @@ export default function Calendar() {
         if (booking.status === 'pending') {
           color = '#f59e0b'; // yellow for pending
         } else if (booking.vehicleId && vehicle) {
-          color = getVehicleColor(vehicle.plateNumber);
+          color = getVehicleColor(vehicle.model, vehicle.plateNumber);
         } else {
           color = '#6b7280'; // default grey
         }
@@ -343,7 +352,7 @@ export default function Calendar() {
                     </div>
                     <div>
                       <span className="font-medium text-gray-600">Unit/Jabatan:</span>
-                      <p className="mt-1">{selectedBooking.unit}</p>
+                      <p className="mt-1">{selectedBooking.applicantUnit || selectedBooking.unit}</p>
                     </div>
                   </div>
                 </div>
@@ -374,7 +383,10 @@ export default function Calendar() {
                     {selectedBooking.vehicleId && (
                       <div>
                         <span className="font-medium text-gray-600">Kenderaan:</span>
-                        <p className="mt-1">{vehicles.find((v: any) => v.id === selectedBooking.vehicleId)?.plateNumber}</p>
+                        <p className="mt-1">{(() => {
+                          const vehicle = vehicles.find((v: any) => v.id === selectedBooking.vehicleId);
+                          return vehicle ? `${vehicle.model} (${vehicle.plateNumber})` : selectedBooking.vehicleInfo || 'Kenderaan tidak dijumpai';
+                        })()}</p>
                       </div>
                     )}
                     
@@ -387,7 +399,7 @@ export default function Calendar() {
                     
                     <div>
                       <span className="font-medium text-gray-600">Bilangan Penumpang:</span>
-                      <p className="mt-1">{selectedBooking.passengerCount} orang</p>
+                      <p className="mt-1">{selectedBooking.passengerCount || 1} orang</p>
                     </div>
                   </div>
                 </div>
@@ -449,7 +461,7 @@ export default function Calendar() {
                     {selectedBooking.processedBy && (
                       <div>
                         <span className="font-medium text-gray-600">Diproses oleh:</span>
-                        <p className="mt-1">{selectedBooking.processedBy}</p>
+                        <p className="mt-1">{selectedBooking.processedByName || selectedBooking.processedBy}</p>
                       </div>
                     )}
                     {selectedBooking.processedAt && (

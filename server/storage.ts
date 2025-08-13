@@ -209,14 +209,22 @@ export class DatabaseStorage implements IStorage {
       .from(bookings)
       .leftJoin(users, eq(bookings.userId, users.id))
       .leftJoin(drivers, eq(bookings.driverId, drivers.id))
-      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id));
+      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id))
+      .leftJoin(
+        { processedByUser: users },
+        eq(bookings.processedBy, sql`${users.id}`)
+      );
 
     const baseCountQuery = db
       .select({ count: count() })
       .from(bookings)
       .leftJoin(users, eq(bookings.userId, users.id))
       .leftJoin(drivers, eq(bookings.driverId, drivers.id))
-      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id));
+      .leftJoin(vehicles, eq(bookings.vehicleId, vehicles.id))
+      .leftJoin(
+        { processedByUser: users },
+        eq(bookings.processedBy, sql`${users.id}`)
+      );
 
     // Apply conditions if any
     const query = conditions.length > 0 
@@ -244,7 +252,11 @@ export class DatabaseStorage implements IStorage {
       bookings: results.map(r => ({
         ...r.bookings,
         driverName: r.drivers?.name || null,
-        vehicleInfo: r.vehicles ? `${r.vehicles.model} (${r.vehicles.plateNumber})` : null
+        vehicleInfo: r.vehicles ? `${r.vehicles.model} (${r.vehicles.plateNumber})` : null,
+        unit: r.bookings.applicantUnit,
+        phoneNumber: r.users?.phone || null,
+        email: r.bookings.applicantEmail || r.users?.email || null,
+        processedByName: r.processedByUser?.username || null
       })),
       total
     };
