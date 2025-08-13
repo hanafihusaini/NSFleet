@@ -8,7 +8,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Calendar as BigCalendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import { useAuth } from "@/hooks/useAuth";
-import { BookingModal } from "@/components/BookingModal";
 import { ProcessBookingModal } from "@/components/ProcessBookingModal";
 import { CalendarIcon, Car, Clock, MapPin, User, FileText, Target, StickyNote, ServerCog, Edit } from "lucide-react";
 import type { User as UserType } from "@shared/schema";
@@ -374,7 +373,7 @@ export default function Calendar() {
 
                 <div>
                   <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+                    <CalendarIcon className="h-4 w-4" />
                     Jadual Perjalanan
                   </h4>
                   <div className="space-y-3 text-sm">
