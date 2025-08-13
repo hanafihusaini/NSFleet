@@ -194,7 +194,11 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">No. Kenderaan:</label>
-                      <p className="text-sm text-gray-800 font-mono">{booking.vehiclePlateNumber || booking.vehicle?.plateNumber || '-'}</p>
+                      <p className="text-sm text-gray-800">
+                        {booking.vehicleModel || booking.vehicle?.model || '-'}
+                        {(booking.vehiclePlateNumber || booking.vehicle?.plateNumber) && 
+                          ` - ${booking.vehiclePlateNumber || booking.vehicle?.plateNumber}`}
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-3">

@@ -433,7 +433,11 @@ export default function Calendar() {
                       </div>
                       <div>
                         <span className="text-gray-600">No. Kenderaan:</span>
-                        <p className="font-medium">{selectedBooking.vehiclePlateNumber || selectedBooking.vehicle?.plateNumber || '-'}</p>
+                        <p className="font-medium">
+                          {selectedBooking.vehicleModel || selectedBooking.vehicle?.model || '-'}
+                          {(selectedBooking.vehiclePlateNumber || selectedBooking.vehicle?.plateNumber) && 
+                            ` - ${selectedBooking.vehiclePlateNumber || selectedBooking.vehicle?.plateNumber}`}
+                        </p>
                       </div>
                     </div>
                     <div className="space-y-3 text-sm">
