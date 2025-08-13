@@ -324,6 +324,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newValues: updatedBooking,
       });
 
+      // Send modification email notification
+      if (emailService && updatedBooking.applicantEmail) {
+        try {
+          const emailData = {
+            bookingId: updatedBooking.bookingId,
+            applicantName: updatedBooking.applicantName,
+            applicantEmail: updatedBooking.applicantEmail,
+            destination: updatedBooking.destination,
+            bookingDate: new Date(updatedBooking.departureDate).toLocaleDateString('ms-MY'),
+            returnDate: new Date(updatedBooking.returnDate).toLocaleDateString('ms-MY'),
+            reason: '',
+            processedBy: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
+          };
+
+          // For modifications by superadmin, use specific modification email
+          await emailService.sendBookingModification(emailData);
+        } catch (emailError) {
+          console.error('Failed to send modification email:', emailError);
+          // Don't fail the booking modification if email fails
+        }
+      }
+
       res.json(updatedBooking);
     } catch (error) {
       handleError(error, req, res);

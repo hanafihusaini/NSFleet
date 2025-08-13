@@ -255,6 +255,53 @@ Negeri Sembilan
   `
 });
 
+const getBookingModificationTemplate = (data: BookingEmailData) => ({
+  subject: `Permohonan Kenderaan Dikemaskini oleh Pentadbir - ${data.bookingId}`,
+  text: `
+Permohonan kenderaan anda telah DIKEMASKINI oleh pentadbir sistem.
+
+ID Tempahan: ${data.bookingId}
+Nama Pemohon: ${data.applicantName}
+Destinasi: ${data.destination}
+Tarikh Perjalanan: ${data.bookingDate}
+Tarikh Pulang: ${data.returnDate}
+
+Kemaskini dilakukan oleh: ${data.processedBy}
+
+Sila log masuk ke sistem untuk melihat status terkini permohonan anda.
+
+Jabatan Akauntan Negara Malaysia
+Negeri Sembilan
+  `,
+  html: `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #1e40af;">Permohonan Kenderaan Dikemaskini</h2>
+      <p>Permohonan kenderaan anda telah <strong>DIKEMASKINI</strong> oleh pentadbir sistem.</p>
+      
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="margin-top: 0;">Maklumat Permohonan:</h3>
+        <p><strong>ID Tempahan:</strong> ${data.bookingId}</p>
+        <p><strong>Nama Pemohon:</strong> ${data.applicantName}</p>
+        <p><strong>Destinasi:</strong> ${data.destination}</p>
+        <p><strong>Tarikh Perjalanan:</strong> ${data.bookingDate}</p>
+        <p><strong>Tarikh Pulang:</strong> ${data.returnDate}</p>
+      </div>
+      
+      <div style="background-color: #e0f2fe; padding: 15px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+        <p style="margin: 0;"><strong>Kemaskini oleh:</strong> ${data.processedBy}</p>
+      </div>
+      
+      <p>Sila log masuk ke sistem untuk melihat status dan maklumat terkini permohonan anda.</p>
+      
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+      <p style="color: #6b7280; font-size: 14px;">
+        Jabatan Akauntan Negara Malaysia<br>
+        Negeri Sembilan
+      </p>
+    </div>
+  `
+});
+
 // Main email service class
 export class EmailService {
   private provider: EmailProvider;
@@ -299,6 +346,17 @@ export class EmailService {
 
   async sendBookingRejection(data: BookingEmailData): Promise<boolean> {
     const template = getBookingRejectionTemplate(data);
+    return await this.provider.sendEmail({
+      to: data.applicantEmail,
+      from: this.fromEmail,
+      subject: template.subject,
+      text: template.text,
+      html: template.html
+    });
+  }
+
+  async sendBookingModification(data: BookingEmailData): Promise<boolean> {
+    const template = getBookingModificationTemplate(data);
     return await this.provider.sendEmail({
       to: data.applicantEmail,
       from: this.fromEmail,
