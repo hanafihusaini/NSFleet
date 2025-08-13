@@ -101,14 +101,28 @@ export default function Calendar() {
       .filter((booking: any) => booking.status === 'approved' || booking.status === 'pending')
       .map((booking: any) => {
         const vehicle = vehicles.find((v: any) => v.id === booking.vehicleId);
-        const vehicleNumber = vehicle?.plateNumber || 'Tiada Kenderaan';
+        const vehicleNumber = vehicle?.plateNumber || '';
+        
+        // Format dates for display
+        const departureDate = new Date(booking.departureDate).toLocaleDateString('ms-MY');
+        const returnDate = new Date(booking.returnDate).toLocaleDateString('ms-MY');
+        const dateRange = departureDate === returnDate ? departureDate : `${departureDate}/${returnDate}`;
+        
+        // Create event title based on booking status
+        let title: string;
+        if (booking.status === 'pending') {
+          title = `${dateRange} - ${booking.destination} - ${booking.purpose}`;
+        } else {
+          title = `${vehicleNumber} - ${dateRange} - ${booking.destination} - ${booking.purpose}`;
+        }
+        
         const color = booking.vehicleId 
           ? vehicleColorMap[booking.vehicleId] 
           : booking.status === 'pending' ? '#f59e0b' : '#6b7280';
 
         return {
           id: booking.id,
-          title: `${vehicleNumber} - ${booking.destination}`,
+          title,
           start: new Date(booking.departureDate),
           end: new Date(booking.returnDate),
           resource: {
@@ -231,7 +245,7 @@ export default function Calendar() {
               <div className="flex flex-wrap gap-4 items-center">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-                  <span className="text-sm">Tempahan Tertunda</span>
+                  <span className="text-sm">Tempahan Baru</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-blue-500 rounded"></div>
@@ -302,72 +316,163 @@ export default function Calendar() {
 
       {/* Booking Details Modal */}
       <Dialog open={showBookingModal} onOpenChange={setShowBookingModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Butiran Tempahan - {selectedBooking?.bookingId}</DialogTitle>
           </DialogHeader>
           
           {selectedBooking && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-500" />
-                    <span className="font-medium">Pemohon:</span>
-                    <span>{selectedBooking.applicantName}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <span className="font-medium">Destinasi:</span>
-                    <span>{selectedBooking.destination}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <span className="font-medium">Tarikh:</span>
-                    <span>
-                      {new Date(selectedBooking.departureDate).toLocaleDateString('ms-MY')} - {new Date(selectedBooking.returnDate).toLocaleDateString('ms-MY')}
-                    </span>
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold border-b pb-2">Maklumat Pemohon</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="font-medium text-gray-600">Nama Pemohon:</span>
+                      <p className="mt-1">{selectedBooking.applicantName}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">No. Telefon:</span>
+                      <p className="mt-1">{selectedBooking.phoneNumber}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">Email:</span>
+                      <p className="mt-1">{selectedBooking.email}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">Unit/Jabatan:</span>
+                      <p className="mt-1">{selectedBooking.unit}</p>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <div>
-                    <span className="font-medium">Status:</span>
-                    <Badge 
-                      variant="outline" 
-                      className={selectedBooking.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
-                    >
-                      {selectedBooking.status === 'approved' ? 'Diluluskan' : 'Tertunda'}
-                    </Badge>
-                  </div>
-                  
-                  {selectedBooking.vehicleId && (
-                    <div className="flex items-center gap-2">
-                      <Car className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">Kenderaan:</span>
-                      <span>{vehicles.find((v: any) => v.id === selectedBooking.vehicleId)?.plateNumber}</span>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold border-b pb-2">Status & Kenderaan</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="font-medium text-gray-600">Status:</span>
+                      <div className="mt-1">
+                        <Badge 
+                          variant="outline" 
+                          className={
+                            selectedBooking.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            selectedBooking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            selectedBooking.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }
+                        >
+                          {selectedBooking.status === 'approved' ? 'Diluluskan' :
+                           selectedBooking.status === 'pending' ? 'Baru' :
+                           selectedBooking.status === 'rejected' ? 'Ditolak' :
+                           selectedBooking.status}
+                        </Badge>
+                      </div>
                     </div>
-                  )}
-                  
-                  <div>
-                    <span className="font-medium">Tujuan:</span>
-                    <p className="text-sm text-gray-600">{selectedBooking.purpose}</p>
+                    
+                    {selectedBooking.vehicleId && (
+                      <div>
+                        <span className="font-medium text-gray-600">Kenderaan:</span>
+                        <p className="mt-1">{vehicles.find((v: any) => v.id === selectedBooking.vehicleId)?.plateNumber}</p>
+                      </div>
+                    )}
+                    
+                    {selectedBooking.driverId && (
+                      <div>
+                        <span className="font-medium text-gray-600">Pemandu:</span>
+                        <p className="mt-1">{selectedBooking.driverName}</p>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <span className="font-medium text-gray-600">Bilangan Penumpang:</span>
+                      <p className="mt-1">{selectedBooking.passengerCount} orang</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              {selectedBooking.notes && (
-                <div>
-                  <span className="font-medium">Catatan:</span>
-                  <p className="text-sm text-gray-600">{selectedBooking.notes}</p>
+
+              {/* Trip Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold border-b pb-2">Butiran Perjalanan</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <div>
+                      <span className="font-medium text-gray-600">Destinasi:</span>
+                      <p className="mt-1">{selectedBooking.destination}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">Tujuan:</span>
+                      <p className="mt-1">{selectedBooking.purpose}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="font-medium text-gray-600">Tarikh & Masa Berlepas:</span>
+                      <p className="mt-1">{new Date(selectedBooking.departureDate).toLocaleDateString('ms-MY')} pada {selectedBooking.departureTime}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">Tarikh & Masa Pulang:</span>
+                      <p className="mt-1">{new Date(selectedBooking.returnDate).toLocaleDateString('ms-MY')} pada {selectedBooking.returnTime}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Information */}
+              {(selectedBooking.notes || selectedBooking.driverInstruction) && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold border-b pb-2">Maklumat Tambahan</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {selectedBooking.notes && (
+                      <div>
+                        <span className="font-medium text-gray-600">Catatan Pemohon:</span>
+                        <p className="mt-1 p-3 bg-gray-50 rounded-lg">{selectedBooking.notes}</p>
+                      </div>
+                    )}
+                    {selectedBooking.driverInstruction && (
+                      <div>
+                        <span className="font-medium text-gray-600">Arahan kepada Pemandu:</span>
+                        <p className="mt-1 p-3 bg-blue-50 rounded-lg">{selectedBooking.driverInstruction}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Processing Information */}
+              {(selectedBooking.processedBy || selectedBooking.rejectionReason) && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold border-b pb-2">Maklumat Pemprosesan</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {selectedBooking.processedBy && (
+                      <div>
+                        <span className="font-medium text-gray-600">Diproses oleh:</span>
+                        <p className="mt-1">{selectedBooking.processedBy}</p>
+                      </div>
+                    )}
+                    {selectedBooking.processedAt && (
+                      <div>
+                        <span className="font-medium text-gray-600">Tarikh Diproses:</span>
+                        <p className="mt-1">{new Date(selectedBooking.processedAt).toLocaleString('ms-MY')}</p>
+                      </div>
+                    )}
+                    {selectedBooking.rejectionReason && (
+                      <div className="md:col-span-2">
+                        <span className="font-medium text-gray-600">Sebab Penolakan:</span>
+                        <p className="mt-1 p-3 bg-red-50 rounded-lg text-red-800">{selectedBooking.rejectionReason}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
               
+              {/* Action Buttons */}
               {isAdmin && (
                 <div className="flex gap-2 pt-4 border-t">
                   {selectedBooking.status === 'pending' && (
                     <Button onClick={() => handleProcessBooking(selectedBooking)}>
-                      Proses Tempahan
+                      Proses Permohonan
                     </Button>
                   )}
                   {user?.role === 'superadmin' && selectedBooking.status !== 'pending' && (
