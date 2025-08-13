@@ -246,7 +246,7 @@ export class DatabaseStorage implements IStorage {
       .offset(filters?.offset || 0);
 
     // Get processed by user info for each booking
-    const processedByUserIds = [...new Set(results.map(r => r.booking.processedBy).filter(Boolean))];
+    const processedByUserIds = Array.from(new Set(results.map(r => r.booking.processedBy).filter(Boolean)));
     const processedByUsers = processedByUserIds.length > 0 ? await db
       .select()
       .from(users)

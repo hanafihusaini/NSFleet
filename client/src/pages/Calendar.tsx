@@ -10,7 +10,7 @@ import moment from "moment";
 import { useAuth } from "@/hooks/useAuth";
 import { BookingModal } from "@/components/BookingModal";
 import { ProcessBookingModal } from "@/components/ProcessBookingModal";
-import { CalendarIcon, Car, Clock, MapPin, User } from "lucide-react";
+import { CalendarIcon, Car, Clock, MapPin, User, FileText, Target, StickyNote, ServerCog, Edit } from "lucide-react";
 import type { User as UserType } from "@shared/schema";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../styles/calendar.css";
@@ -77,7 +77,16 @@ export default function Calendar() {
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
   const { data: bookingsData } = useQuery<any>({
-    queryKey: ['/api/bookings'],
+    queryKey: ['/api/bookings', 'calendar'],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('limit', '1000'); // Get all bookings for calendar
+      params.append('offset', '0');
+      
+      const response = await fetch(`/api/bookings?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch bookings');
+      return response.json();
+    },
     enabled: !!user
   });
 
@@ -324,177 +333,175 @@ export default function Calendar() {
         </Card>
       </div>
 
-      {/* Booking Details Modal */}
+      {/* Booking Details Modal - Same format as Applications page */}
       <Dialog open={showBookingModal} onOpenChange={setShowBookingModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Butiran Tempahan - {selectedBooking?.bookingId}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Butiran Permohonan: {selectedBooking?.bookingId}
+            </DialogTitle>
           </DialogHeader>
           
           {selectedBooking && (
             <div className="space-y-6">
-              {/* Basic Information */}
+              {/* Application Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2">Maklumat Pemohon</h3>
-                  <div className="space-y-3">
+                <div>
+                  <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Maklumat Permohonan
+                  </h4>
+                  <div className="space-y-3 text-sm">
                     <div>
-                      <span className="font-medium text-gray-600">Nama Pemohon:</span>
-                      <p className="mt-1">{selectedBooking.applicantName}</p>
+                      <span className="text-gray-600">Nama Pemohon:</span>
+                      <p className="font-medium">{selectedBooking.applicantName}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-600">No. Telefon:</span>
-                      <p className="mt-1">{selectedBooking.phoneNumber}</p>
+                      <span className="text-gray-600">Unit:</span>
+                      <p className="font-medium">{selectedBooking.applicantUnit || selectedBooking.unit}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-600">Email:</span>
-                      <p className="mt-1">{selectedBooking.email}</p>
+                      <span className="text-gray-600">Tarikh Permohonan:</span>
+                      <p className="font-medium">{new Date(selectedBooking.submissionDate).toLocaleDateString('ms-MY')}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-600">Unit/Jabatan:</span>
-                      <p className="mt-1">{selectedBooking.applicantUnit || selectedBooking.unit}</p>
+                      <span className="text-gray-600">Nama Penumpang:</span>
+                      <p className="font-medium">{selectedBooking.passengerName || '-'}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2">Status & Kenderaan</h3>
-                  <div className="space-y-3">
+                <div>
+                  <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Jadual Perjalanan
+                  </h4>
+                  <div className="space-y-3 text-sm">
                     <div>
-                      <span className="font-medium text-gray-600">Status:</span>
-                      <div className="mt-1">
-                        <Badge 
-                          variant="outline" 
-                          className={
-                            selectedBooking.status === 'approved' ? 'bg-green-100 text-green-800' :
-                            selectedBooking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            selectedBooking.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }
-                        >
-                          {selectedBooking.status === 'approved' ? 'Diluluskan' :
-                           selectedBooking.status === 'pending' ? 'Baru' :
-                           selectedBooking.status === 'rejected' ? 'Ditolak' :
-                           selectedBooking.status}
-                        </Badge>
-                      </div>
+                      <span className="text-gray-600">Tarikh & Masa Pergi:</span>
+                      <p className="font-medium">
+                        {new Date(selectedBooking.departureDate).toLocaleDateString('ms-MY')}
+                        {selectedBooking.departureTime ? ` - ${selectedBooking.departureTime}` : ''}
+                      </p>
                     </div>
-                    
-                    {selectedBooking.vehicleId && (
+                    <div>
+                      <span className="text-gray-600">Tarikh & Masa Balik:</span>
+                      <p className="font-medium">
+                        {new Date(selectedBooking.returnDate).toLocaleDateString('ms-MY')}
+                        {selectedBooking.returnTime ? ` - ${selectedBooking.returnTime}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-1">
+                      <MapPin className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <span className="font-medium text-gray-600">Kenderaan:</span>
-                        <p className="mt-1">{(() => {
-                          const vehicle = vehicles.find((v: any) => v.id === selectedBooking.vehicleId);
-                          return vehicle ? `${vehicle.model} (${vehicle.plateNumber})` : selectedBooking.vehicleInfo || 'Kenderaan tidak dijumpai';
-                        })()}</p>
+                        <span className="text-gray-600">Destinasi:</span>
+                        <p className="font-medium">{selectedBooking.destination}</p>
                       </div>
-                    )}
-                    
-                    {selectedBooking.driverId && (
+                    </div>
+                    <div className="flex items-start gap-1">
+                      <Target className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <span className="font-medium text-gray-600">Pemandu:</span>
-                        <p className="mt-1">{selectedBooking.driverName}</p>
+                        <span className="text-gray-600">Tujuan:</span>
+                        <p className="font-medium">{selectedBooking.purpose}</p>
                       </div>
-                    )}
-                    
-                    <div>
-                      <span className="font-medium text-gray-600">Bilangan Penumpang:</span>
-                      <p className="mt-1">{selectedBooking.passengerCount || 1} orang</p>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Trip Details */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Butiran Perjalanan</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <div>
-                      <span className="font-medium text-gray-600">Destinasi:</span>
-                      <p className="mt-1">{selectedBooking.destination}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-600">Tujuan:</span>
-                      <p className="mt-1">{selectedBooking.purpose}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <span className="font-medium text-gray-600">Tarikh & Masa Berlepas:</span>
-                      <p className="mt-1">{new Date(selectedBooking.departureDate).toLocaleDateString('ms-MY')}{selectedBooking.departureTime ? ` pada ${selectedBooking.departureTime}` : ''}</p>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-600">Tarikh & Masa Pulang:</span>
-                      <p className="mt-1">{new Date(selectedBooking.returnDate).toLocaleDateString('ms-MY')}{selectedBooking.returnTime ? ` pada ${selectedBooking.returnTime}` : ''}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Additional Information */}
-              {(selectedBooking.notes || selectedBooking.driverInstruction) && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2">Maklumat Tambahan</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {selectedBooking.notes && (
-                      <div>
-                        <span className="font-medium text-gray-600">Catatan Pemohon:</span>
-                        <p className="mt-1 p-3 bg-gray-50 rounded-lg">{selectedBooking.notes}</p>
-                      </div>
-                    )}
-                    {selectedBooking.driverInstruction && (
-                      <div>
-                        <span className="font-medium text-gray-600">Arahan kepada Pemandu:</span>
-                        <p className="mt-1 p-3 bg-blue-50 rounded-lg">{selectedBooking.driverInstruction}</p>
+                      <div className="flex items-start gap-1">
+                        <StickyNote className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <span className="text-gray-600">Catatan:</span>
+                          <p className="font-medium">{selectedBooking.notes}</p>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Processing Information */}
-              {(selectedBooking.processedBy || selectedBooking.rejectionReason) && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2">Maklumat Pemprosesan</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {selectedBooking.processedBy && (
-                      <div>
-                        <span className="font-medium text-gray-600">Diproses oleh:</span>
-                        <p className="mt-1">{selectedBooking.processedByName || selectedBooking.processedBy}</p>
-                      </div>
-                    )}
-                    {selectedBooking.processedAt && (
-                      <div>
-                        <span className="font-medium text-gray-600">Tarikh Diproses:</span>
-                        <p className="mt-1">{new Date(selectedBooking.processedAt).toLocaleString('ms-MY')}</p>
-                      </div>
-                    )}
-                    {selectedBooking.rejectionReason && (
-                      <div className="md:col-span-2">
-                        <span className="font-medium text-gray-600">Sebab Penolakan:</span>
-                        <p className="mt-1 p-3 bg-red-50 rounded-lg text-red-800">{selectedBooking.rejectionReason}</p>
-                      </div>
-                    )}
+              <div>
+                <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Maklumat Pemprosesan
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <span className="text-gray-600 text-sm">Status:</span>
+                    <div className="mt-1">
+                      <Badge 
+                        variant="outline" 
+                        className={
+                          selectedBooking.status === 'approved' ? 'bg-green-100 text-green-800 border-green-200' :
+                          selectedBooking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                          selectedBooking.status === 'rejected' ? 'bg-red-100 text-red-800 border-red-200' :
+                          'bg-gray-100 text-gray-800 border-gray-200'
+                        }
+                      >
+                        {selectedBooking.status === 'approved' ? 'Diluluskan' :
+                         selectedBooking.status === 'pending' ? 'Baru' :
+                         selectedBooking.status === 'rejected' ? 'Ditolak' :
+                         selectedBooking.status}
+                      </Badge>
+                    </div>
                   </div>
+                  
+                  {selectedBooking.status !== 'pending' && (
+                    <>
+                      <div>
+                        <span className="text-gray-600 text-sm">Masa Pemprosesan:</span>
+                        <p className="font-medium text-sm">
+                          {(() => {
+                            const submissionDate = new Date(selectedBooking.submissionDate);
+                            const endDate = selectedBooking.processedDate ? new Date(selectedBooking.processedDate) : new Date();
+                            const days = Math.max(0, Math.floor((endDate.getTime() - submissionDate.getTime()) / (1000 * 60 * 60 * 24)));
+                            return `${days} hari kerja`;
+                          })()}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600 text-sm">Tarikh Diproses:</span>
+                        <p className="font-medium text-sm">
+                          {selectedBooking.processedDate ? new Date(selectedBooking.processedDate).toLocaleDateString('ms-MY') : '-'}
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
+                
+                {selectedBooking.rejectionReason && (
+                  <div className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+                    <span className="text-red-800 font-medium text-sm">Sebab Penolakan:</span>
+                    <p className="text-red-700 text-sm mt-1">{selectedBooking.rejectionReason}</p>
+                  </div>
+                )}
+              </div>
               
               {/* Action Buttons */}
-              {isAdmin && (
-                <div className="flex gap-2 pt-4 border-t">
-                  {selectedBooking.status === 'pending' && (
-                    <Button onClick={() => handleProcessBooking(selectedBooking)}>
-                      Proses Permohonan
-                    </Button>
-                  )}
-                  {user?.role === 'superadmin' && selectedBooking.status !== 'pending' && (
-                    <Button variant="outline" onClick={() => handleProcessBooking(selectedBooking)}>
-                      Ubah Suai Tempahan
-                    </Button>
-                  )}
-                </div>
-              )}
+              <div className="flex gap-2 pt-4 border-t">
+                {isAdmin && selectedBooking.status === 'pending' && (
+                  <Button 
+                    onClick={() => handleProcessBooking(selectedBooking)}
+                    className="flex items-center gap-2"
+                  >
+                    <ServerCog className="h-4 w-4" />
+                    Proses Permohonan
+                  </Button>
+                )}
+                {isAdmin && user?.role === 'superadmin' && selectedBooking.status !== 'pending' && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleProcessBooking(selectedBooking)}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Proses Permohonan
+                  </Button>
+                )}
+                <Button variant="outline" onClick={() => setShowBookingModal(false)}>
+                  Tutup
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>

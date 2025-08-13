@@ -65,7 +65,8 @@ export default function Applications() {
 
   const handleSearch = () => {
     setCurrentPage(1);
-    queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
+    // Force immediate refetch with updated filters
+    queryClient.refetchQueries({ queryKey: ['/api/bookings', filters, 1] });
   };
 
   const handleViewDetails = (booking: any) => {
