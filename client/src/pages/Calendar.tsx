@@ -40,17 +40,13 @@ const publicHolidays = [
   { date: "2025-09-05", name: "Maulidur Rasul (Est.)" },
 ];
 
-// Vehicle colors for differentiation
-const vehicleColors = [
-  "#3b82f6", // blue
-  "#ef4444", // red
-  "#10b981", // green
-  "#f59e0b", // amber
-  "#8b5cf6", // violet
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-  "#84cc16", // lime
-];
+// Vehicle colors - specific mapping
+const getVehicleColor = (plateNumber: string) => {
+  if (plateNumber?.toLowerCase().includes('fortuner')) return '#000000'; // black
+  if (plateNumber?.toLowerCase().includes('xtrail')) return '#6b7280'; // grey
+  if (plateNumber?.toLowerCase().includes('aruz')) return '#8b5cf6'; // purple
+  return '#3b82f6'; // default blue
+};
 
 interface CalendarEvent {
   id: string;
@@ -89,8 +85,8 @@ export default function Calendar() {
   // Create vehicle color mapping
   const vehicleColorMap = useMemo(() => {
     const map: { [key: string]: string } = {};
-    vehicles.forEach((vehicle: any, index: number) => {
-      map[vehicle.id] = vehicleColors[index % vehicleColors.length];
+    vehicles.forEach((vehicle: any) => {
+      map[vehicle.id] = getVehicleColor(vehicle.plateNumber);
     });
     return map;
   }, [vehicles]);
@@ -103,22 +99,22 @@ export default function Calendar() {
         const vehicle = vehicles.find((v: any) => v.id === booking.vehicleId);
         const vehicleNumber = vehicle?.plateNumber || '';
         
-        // Format dates for display
-        const departureDate = new Date(booking.departureDate).toLocaleDateString('ms-MY');
-        const returnDate = new Date(booking.returnDate).toLocaleDateString('ms-MY');
-        const dateRange = departureDate === returnDate ? departureDate : `${departureDate}/${returnDate}`;
+        // Format dates and times for display
+        const departureDateTime = `${new Date(booking.departureDate).toLocaleDateString('ms-MY')} ${booking.departureTime || ''}`.trim();
+        const returnDateTime = `${new Date(booking.returnDate).toLocaleDateString('ms-MY')} ${booking.returnTime || ''}`.trim();
         
-        // Create event title based on booking status
-        let title: string;
+        // Create event title - same format for both pending and approved, differentiate by color
+        const title = `${departureDateTime} - ${returnDateTime} - ${booking.destination} - ${booking.purpose}`;
+        
+        // Determine color based on status and vehicle
+        let color: string;
         if (booking.status === 'pending') {
-          title = `${dateRange} - ${booking.destination} - ${booking.purpose}`;
+          color = '#f59e0b'; // yellow for pending
+        } else if (booking.vehicleId && vehicle) {
+          color = getVehicleColor(vehicle.plateNumber);
         } else {
-          title = `${vehicleNumber} - ${dateRange} - ${booking.destination} - ${booking.purpose}`;
+          color = '#6b7280'; // default grey
         }
-        
-        const color = booking.vehicleId 
-          ? vehicleColorMap[booking.vehicleId] 
-          : booking.status === 'pending' ? '#f59e0b' : '#6b7280';
 
         return {
           id: booking.id,
@@ -248,15 +244,20 @@ export default function Calendar() {
                   <span className="text-sm">Tempahan Baru</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                  <span className="text-sm">Tempahan Diluluskan</span>
+                  <div className="w-4 h-4 bg-black rounded"></div>
+                  <span className="text-sm">Fortuner</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-500 rounded"></div>
+                  <span className="text-sm">X-Trail</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                  <span className="text-sm">Aruz</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-red-600 rounded"></div>
                   <span className="text-sm">Cuti Umum</span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  Warna berbeza menunjukkan kenderaan yang berlainan
                 </div>
               </div>
               
@@ -409,11 +410,11 @@ export default function Calendar() {
                   <div className="space-y-3">
                     <div>
                       <span className="font-medium text-gray-600">Tarikh & Masa Berlepas:</span>
-                      <p className="mt-1">{new Date(selectedBooking.departureDate).toLocaleDateString('ms-MY')} pada {selectedBooking.departureTime}</p>
+                      <p className="mt-1">{new Date(selectedBooking.departureDate).toLocaleDateString('ms-MY')}{selectedBooking.departureTime ? ` pada ${selectedBooking.departureTime}` : ''}</p>
                     </div>
                     <div>
                       <span className="font-medium text-gray-600">Tarikh & Masa Pulang:</span>
-                      <p className="mt-1">{new Date(selectedBooking.returnDate).toLocaleDateString('ms-MY')} pada {selectedBooking.returnTime}</p>
+                      <p className="mt-1">{new Date(selectedBooking.returnDate).toLocaleDateString('ms-MY')}{selectedBooking.returnTime ? ` pada ${selectedBooking.returnTime}` : ''}</p>
                     </div>
                   </div>
                 </div>
