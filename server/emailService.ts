@@ -100,8 +100,9 @@ Terima kasih atas permohonan kenderaan anda.
 ID Tempahan: ${data.bookingId}
 Nama Pemohon: ${data.applicantName}
 Destinasi: ${data.destination}
-Tarikh Perjalanan: ${data.bookingDate}
-Tarikh Pulang: ${data.returnDate}
+Tujuan: ${data.purpose || '-'}
+Tarikh & Masa Pergi: ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}
+Tarikh & Masa Balik: ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}
 
 Status: Menunggu Kelulusan
 
@@ -120,8 +121,9 @@ Negeri Sembilan
         <p><strong>ID Tempahan:</strong> ${data.bookingId}</p>
         <p><strong>Nama Pemohon:</strong> ${data.applicantName}</p>
         <p><strong>Destinasi:</strong> ${data.destination}</p>
-        <p><strong>Tarikh Perjalanan:</strong> ${data.bookingDate}</p>
-        <p><strong>Tarikh Pulang:</strong> ${data.returnDate}</p>
+        <p><strong>Tujuan:</strong> ${data.purpose || '-'}</p>
+        <p><strong>Tarikh & Masa Pergi:</strong> ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}</p>
+        <p><strong>Tarikh & Masa Balik:</strong> ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}</p>
       </div>
       
       <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;">
@@ -227,8 +229,9 @@ Permohonan kenderaan anda tidak dapat diluluskan.
 ID Tempahan: ${data.bookingId}
 Nama Pemohon: ${data.applicantName}
 Destinasi: ${data.destination}
-Tarikh Perjalanan: ${data.bookingDate}
-Tarikh Pulang: ${data.returnDate}
+Tujuan: ${data.purpose || '-'}
+Tarikh & Masa Pergi: ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}
+Tarikh & Masa Balik: ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}
 
 Sebab: ${data.reason || 'Tiada sebab diberikan'}
 
@@ -251,8 +254,9 @@ Negeri Sembilan
         <p><strong>ID Tempahan:</strong> ${data.bookingId}</p>
         <p><strong>Nama Pemohon:</strong> ${data.applicantName}</p>
         <p><strong>Destinasi:</strong> ${data.destination}</p>
-        <p><strong>Tarikh Perjalanan:</strong> ${data.bookingDate}</p>
-        <p><strong>Tarikh Pulang:</strong> ${data.returnDate}</p>
+        <p><strong>Tujuan:</strong> ${data.purpose || '-'}</p>
+        <p><strong>Tarikh & Masa Pergi:</strong> ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}</p>
+        <p><strong>Tarikh & Masa Balik:</strong> ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}</p>
       </div>
       
       <div style="background-color: #fee2e2; padding: 15px; border-radius: 8px; border-left: 4px solid #dc2626;">
@@ -292,8 +296,9 @@ Permohonan kenderaan anda telah DIKEMASKINI oleh pentadbir sistem.
 ID Tempahan: ${data.bookingId}
 Nama Pemohon: ${data.applicantName}
 Destinasi: ${data.destination}
-Tarikh Perjalanan: ${data.bookingDate}
-Tarikh Pulang: ${data.returnDate}
+Tujuan: ${data.purpose || '-'}
+Tarikh & Masa Pergi: ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}
+Tarikh & Masa Balik: ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}
 
 Kemaskini dilakukan oleh: ${data.processedBy}
 
@@ -312,8 +317,9 @@ Negeri Sembilan
         <p><strong>ID Tempahan:</strong> ${data.bookingId}</p>
         <p><strong>Nama Pemohon:</strong> ${data.applicantName}</p>
         <p><strong>Destinasi:</strong> ${data.destination}</p>
-        <p><strong>Tarikh Perjalanan:</strong> ${data.bookingDate}</p>
-        <p><strong>Tarikh Pulang:</strong> ${data.returnDate}</p>
+        <p><strong>Tujuan:</strong> ${data.purpose || '-'}</p>
+        <p><strong>Tarikh & Masa Pergi:</strong> ${data.bookingDate}${data.bookingTime ? ` - ${data.bookingTime}` : ''}</p>
+        <p><strong>Tarikh & Masa Balik:</strong> ${data.returnDate}${data.returnTime ? ` - ${data.returnTime}` : ''}</p>
       </div>
       
       <div style="background-color: #e0f2fe; padding: 15px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
