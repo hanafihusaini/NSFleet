@@ -160,11 +160,11 @@ export default function Applications() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Destinasi</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tarikh Perjalanan</label>
                 <Input 
-                  placeholder="Cari destinasi..."
-                  value={filters.destination}
-                  onChange={(e) => setFilters({...filters, destination: e.target.value})}
+                  type="date"
+                  value={filters.departureDate}
+                  onChange={(e) => setFilters({...filters, departureDate: e.target.value})}
                   className="text-xs"
                 />
               </div>

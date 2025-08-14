@@ -23,6 +23,7 @@ export default function BookingStatus() {
   const [showModal, setShowModal] = useState(false);
   const [filters, setFilters] = useState({
     status: 'all',
+    bookingId: '',
     departureDate: '',
     destination: '',
     purpose: '',
@@ -122,6 +123,11 @@ export default function BookingStatus() {
       return false;
     }
     
+    // Booking ID filter
+    if (filters.bookingId && !booking.bookingId.toLowerCase().includes(filters.bookingId.toLowerCase())) {
+      return false;
+    }
+    
     // Date filter - check if search date falls within booking date range
     if (filters.departureDate) {
       const filterDate = new Date(filters.departureDate);
@@ -161,7 +167,7 @@ export default function BookingStatus() {
             <CardTitle>Penapis</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <Select value={filters.status} onValueChange={(value) => setFilters({...filters, status: value})}>
@@ -176,6 +182,15 @@ export default function BookingStatus() {
                     <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">ID Tempahan</label>
+                <Input 
+                  placeholder="Cari ID..."
+                  value={filters.bookingId}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters({...filters, bookingId: e.target.value})}
+                />
               </div>
               
               <div>
@@ -209,7 +224,7 @@ export default function BookingStatus() {
             <div className="flex justify-end mt-4">
               <Button 
                 variant="outline" 
-                onClick={() => setFilters({ status: 'all', departureDate: '', destination: '', purpose: '' })}
+                onClick={() => setFilters({ status: 'all', bookingId: '', departureDate: '', destination: '', purpose: '' })}
                 className="mr-2"
               >
                 Reset Penapis
