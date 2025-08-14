@@ -157,7 +157,7 @@ ${data.driverName || data.vehicleModel || data.vehiclePlateNumber ? `
 Maklumat Kenderaan:
 ${data.driverName ? `Nama Pemandu: ${data.driverName}` : ''}
 ${data.vehicleModel && data.vehiclePlateNumber ? `No. Kenderaan: ${data.vehicleModel} - ${data.vehiclePlateNumber}` : ''}
-${data.driverPhone ? `Contact Pemandu: ${data.driverPhone}` : ''}
+${data.driverPhone ? `No. Tel. Pemandu: ${data.driverPhone}` : ''}
 ` : ''}
 
 Status: Diluluskan
@@ -191,7 +191,7 @@ Negeri Sembilan
           <h3 style="margin-top: 0; color: #0ea5e9;">Maklumat Kenderaan:</h3>
           ${data.driverName ? `<p><strong>Nama Pemandu:</strong> ${data.driverName}</p>` : ''}
           ${data.vehicleModel && data.vehiclePlateNumber ? `<p><strong>No. Kenderaan:</strong> ${data.vehicleModel} - ${data.vehiclePlateNumber}</p>` : ''}
-          ${data.driverPhone ? `<p><strong>Contact Pemandu:</strong> ${data.driverPhone}</p>` : ''}
+          ${data.driverPhone ? `<p><strong>No. Tel. Pemandu:</strong> ${data.driverPhone}</p>` : ''}
         </div>
       ` : ''}
       
