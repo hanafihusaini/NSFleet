@@ -26,7 +26,7 @@ export default function Applications() {
   const [showProcessModal, setShowProcessModal] = useState(false);
   const [filters, setFilters] = useState({
     status: 'all',
-    applicantName: '',
+    bookingId: '',
     departureDate: '',
     destination: '',
     purpose: '',
@@ -132,11 +132,11 @@ export default function Applications() {
             <CardTitle>Penapis & Carian</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <Select value={filters.status} onValueChange={(value) => setFilters({...filters, status: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-xs">
                     <SelectValue placeholder="Semua Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -150,20 +150,12 @@ export default function Applications() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pemohon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">ID Tempahan</label>
                 <Input 
-                  placeholder="Cari nama..."
-                  value={filters.applicantName}
-                  onChange={(e) => setFilters({...filters, applicantName: e.target.value})}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tarikh Perjalanan</label>
-                <Input 
-                  type="date"
-                  value={filters.departureDate}
-                  onChange={(e) => setFilters({...filters, departureDate: e.target.value})}
+                  placeholder="Cari ID..."
+                  value={filters.bookingId}
+                  onChange={(e) => setFilters({...filters, bookingId: e.target.value})}
+                  className="text-xs"
                 />
               </div>
 
@@ -173,6 +165,7 @@ export default function Applications() {
                   placeholder="Cari destinasi..."
                   value={filters.destination}
                   onChange={(e) => setFilters({...filters, destination: e.target.value})}
+                  className="text-xs"
                 />
               </div>
 
@@ -182,13 +175,14 @@ export default function Applications() {
                   placeholder="Cari tujuan..."
                   value={filters.purpose}
                   onChange={(e) => setFilters({...filters, purpose: e.target.value})}
+                  className="text-xs"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pemandu</label>
                 <Select value={filters.driverId} onValueChange={(value) => setFilters({...filters, driverId: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-xs">
                     <SelectValue placeholder="Pilih Pemandu" />
                   </SelectTrigger>
                   <SelectContent>
@@ -205,7 +199,7 @@ export default function Applications() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Kenderaan</label>
                 <Select value={filters.vehicleId} onValueChange={(value) => setFilters({...filters, vehicleId: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-xs">
                     <SelectValue placeholder="Pilih Kenderaan" />
                   </SelectTrigger>
                   <SelectContent>
@@ -219,12 +213,12 @@ export default function Applications() {
                 </Select>
               </div>
 
-              <div className="flex items-end">
-                <Button onClick={handleSearch} className="w-full">
-                  <Search className="h-4 w-4 mr-2" />
-                  Cari
-                </Button>
-              </div>
+            </div>
+            <div className="flex justify-end mt-4">
+              <Button onClick={handleSearch} className="px-6">
+                <Search className="h-4 w-4 mr-2" />
+                Cari
+              </Button>
             </div>
           </CardContent>
         </Card>

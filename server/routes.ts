@@ -107,8 +107,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             applicantName: booking.applicantName,
             applicantEmail: booking.applicantEmail,
             destination: booking.destination,
+            purpose: booking.purpose,
             bookingDate: new Date(booking.departureDate).toLocaleDateString('ms-MY'),
+            bookingTime: booking.departureTime || undefined,
             returnDate: new Date(booking.returnDate).toLocaleDateString('ms-MY'),
+            returnTime: booking.returnTime || undefined,
           });
         } catch (emailError) {
           console.error('Failed to send confirmation email:', emailError);
@@ -141,6 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         const filters = {
           status: req.query.status,
+          bookingId: req.query.bookingId,
           applicantName: req.query.applicantName,
           destination: req.query.destination,
           purpose: req.query.purpose,

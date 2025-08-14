@@ -116,12 +116,10 @@ export default function Calendar() {
         const vehicle = vehicles.find((v: any) => v.id === booking.vehicleId);
         const vehicleNumber = vehicle?.plateNumber || '';
         
-        // Format dates and times for display
-        const departureDateTime = `${new Date(booking.departureDate).toLocaleDateString('ms-MY')} ${booking.departureTime || ''}`.trim();
-        const returnDateTime = `${new Date(booking.returnDate).toLocaleDateString('ms-MY')} ${booking.returnTime || ''}`.trim();
-        
-        // Create event title - same format for both pending and approved, differentiate by color
-        const title = `${departureDateTime} - ${returnDateTime} - ${booking.destination} - ${booking.purpose}`;
+        // Create event title: Booking ID - Departure Time - Return Time - Destination - Purpose
+        const departureTime = booking.departureTime || '';
+        const returnTime = booking.returnTime || '';
+        const title = `${booking.bookingId} - ${departureTime} - ${returnTime} - ${booking.destination} - ${booking.purpose}`;
         
         // Determine color based on status and vehicle
         let color: string;

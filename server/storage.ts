@@ -165,6 +165,9 @@ export class DatabaseStorage implements IStorage {
       if (filters.status) {
         conditions.push(eq(bookings.status, filters.status));
       }
+      if (filters.bookingId) {
+        conditions.push(sql`LOWER(${bookings.bookingId}) LIKE LOWER(${'%' + filters.bookingId + '%'})`);
+      }
       if (filters.applicantName) {
         conditions.push(sql`LOWER(${bookings.applicantName}) LIKE LOWER(${'%' + filters.applicantName + '%'})`);
       }
