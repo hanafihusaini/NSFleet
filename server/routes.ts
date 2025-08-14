@@ -188,7 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.user.role = user.role;
 
       const bookingId = req.params.id;
-      const { status, driverId, vehicleId, driverInstruction, rejectionReason } = req.body;
+      const { status, driverId, vehicleId, driverInstruction, rejectionReason, adminNotes } = req.body;
       
       const existingBooking = await storage.getBooking(bookingId);
       if (!existingBooking) {
@@ -270,15 +270,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             destination: updatedBooking.destination,
             purpose: updatedBooking.purpose,
             bookingDate: new Date(updatedBooking.departureDate).toLocaleDateString('ms-MY'),
-            bookingTime: updatedBooking.departureTime,
+            bookingTime: updatedBooking.departureTime || undefined,
             returnDate: new Date(updatedBooking.returnDate).toLocaleDateString('ms-MY'),
-            returnTime: updatedBooking.returnTime,
-            driverName: driverInfo?.name,
-            driverPhone: driverInfo?.phone,
-            vehicleModel: vehicleInfo?.model,
-            vehiclePlateNumber: vehicleInfo?.plateNumber,
+            returnTime: updatedBooking.returnTime || undefined,
+            driverName: driverInfo?.name || undefined,
+            driverPhone: driverInfo?.phone || undefined,
+            vehicleModel: vehicleInfo?.model || undefined,
+            vehiclePlateNumber: vehicleInfo?.plateNumber || undefined,
             reason: rejectionReason,
-            adminNotes: adminNotes,
+            adminNotes: adminNotes || undefined,
             processedBy: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username,
           };
 
