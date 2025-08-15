@@ -2,6 +2,13 @@
 
 A comprehensive vehicle booking management system designed for the Accountant General's Department of Malaysia, Negeri Sembilan. The system facilitates the application and approval process for government vehicle usage with role-based access control, automated booking ID generation, email notifications, and comprehensive audit trails.
 
+## Recent Changes (August 2025)
+
+- **Unified Working Days Calculation**: Fixed critical discrepancy between Applications and Calendar pages where working days calculation showed different results (5 vs 4 days) for the same booking
+- **Calendar Modal Standardization**: Replaced custom inline modal with standardized BookingModal component to ensure consistent UI and calculation logic across all pages
+- **Restored Admin Processing**: Added "Proses Permohonan" functionality back to Calendar page, allowing admins to approve/reject bookings directly from the calendar view
+- **Filter Consistency**: Updated Applications page filters to match user requirements (Status, Booking ID, Tarikh Perjalanan, Tujuan, Nama Pemandu, Kenderaan) and User Booking Status filters (Status, Booking ID, Tarikh, Destinasi, Tujuan)
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
