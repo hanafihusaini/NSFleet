@@ -2,17 +2,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { FileText, User as UserIcon, Calendar, MapPin, Target, StickyNote, Clock, Printer, Car } from "lucide-react";
+import { FileText, User as UserIcon, Calendar, MapPin, Target, StickyNote, Clock, Printer, Car, ServerCog, Edit } from "lucide-react";
 import { cn, calculateWorkingDays } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 interface BookingModalProps {
   booking: any;
   isOpen: boolean;
   onClose: () => void;
+  onProcessBooking?: (booking: any) => void;
 }
 
-export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
+export function BookingModal({ booking, isOpen, onClose, onProcessBooking }: BookingModalProps) {
   if (!booking) return null;
+  
+  const { user } = useAuth();
+  const isAdmin = (user as any)?.role === 'admin' || (user as any)?.role === 'superadmin';
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -220,16 +225,39 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
           </div>
         </div>
         
-        <div className="flex justify-end space-x-4 mt-6 border-t pt-4">
-          {booking.status === 'approved' && (
-            <Button onClick={handlePrintForm} variant="outline">
-              <Printer className="h-4 w-4 mr-2" />
-              Cetak Borang JANM
+        <div className="flex justify-between space-x-4 mt-6 border-t pt-4">
+          <div className="flex space-x-2">
+            {isAdmin && onProcessBooking && booking.status === 'pending' && (
+              <Button 
+                onClick={() => onProcessBooking(booking)}
+                className="flex items-center gap-2"
+              >
+                <ServerCog className="h-4 w-4" />
+                Proses Permohonan
+              </Button>
+            )}
+            {isAdmin && onProcessBooking && (user as any)?.role === 'superadmin' && booking.status !== 'pending' && (
+              <Button 
+                variant="outline" 
+                onClick={() => onProcessBooking(booking)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                Proses Permohonan
+              </Button>
+            )}
+          </div>
+          <div className="flex space-x-2">
+            {booking.status === 'approved' && (
+              <Button onClick={handlePrintForm} variant="outline">
+                <Printer className="h-4 w-4 mr-2" />
+                Cetak Borang JANM
+              </Button>
+            )}
+            <Button onClick={onClose} variant="outline">
+              Tutup
             </Button>
-          )}
-          <Button onClick={onClose} variant="outline">
-            Tutup
-          </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

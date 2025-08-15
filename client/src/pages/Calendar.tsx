@@ -341,6 +341,11 @@ export default function Calendar() {
             setShowBookingModal(false);
             setSelectedBooking(null);
           }}
+          onProcessBooking={(booking) => {
+            setSelectedBooking(booking);
+            setShowBookingModal(false);
+            setShowProcessModal(true);
+          }}
         />
       )}
 
