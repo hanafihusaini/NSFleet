@@ -36,6 +36,7 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
 
   const calculateProcessingTime = () => {
     const submissionDate = new Date(booking.submissionDate);
+    // Use processedDate first, then modifiedDate, then current date for consistency with Applications page
     const endDate = booking.processedDate 
       ? new Date(booking.processedDate)
       : booking.modifiedDate 
@@ -93,7 +94,7 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
                 {booking.passengerName && (
                   <div>
                     <label className="text-sm font-medium text-gray-600">Nama Penumpang:</label>
-                    <p className="text-sm text-gray-800">{booking.passengerName}</p>
+                    <p className="text-sm text-gray-800">{booking.passengerName || '-'}</p>
                   </div>
                 )}
               </div>
@@ -108,15 +109,13 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
                 <div>
                   <label className="text-sm font-medium text-gray-600">Tarikh & Masa Pergi:</label>
                   <p className="text-sm text-gray-800">
-                    {new Date(booking.departureDate).toLocaleDateString('ms-MY')}
-                    {booking.departureTime ? ` - ${booking.departureTime}` : ''}
+                    {format(new Date(booking.departureDate), 'dd/MM/yyyy')}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Tarikh & Masa Balik:</label>
                   <p className="text-sm text-gray-800">
-                    {new Date(booking.returnDate).toLocaleDateString('ms-MY')}
-                    {booking.returnTime ? ` - ${booking.returnTime}` : ''}
+                    {format(new Date(booking.returnDate), 'dd/MM/yyyy')}
                   </p>
                 </div>
                 <div>
@@ -145,6 +144,38 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
               </div>
             </div>
           </div>
+
+          {/* Vehicle Information for Approved Bookings */}
+          {booking.status === 'approved' && (booking.driver || booking.vehicle || booking.driverName) && (
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Car className="h-4 w-4" />
+                Maklumat Kenderaan
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Nama Pemandu:</label>
+                    <p className="text-sm text-gray-800">{booking.driverName || booking.driver?.name || '-'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">No. Kenderaan:</label>
+                    <p className="text-sm text-gray-800">
+                      {booking.vehicleModel || booking.vehicle?.model || '-'}
+                      {(booking.vehiclePlateNumber || booking.vehicle?.plateNumber) && 
+                        ` - ${booking.vehiclePlateNumber || booking.vehicle?.plateNumber}`}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Arahan Kepada Pemandu:</label>
+                    <p className="text-sm text-gray-800">{booking.driverInstruction || 'Driver Must Wait'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* Processing Information */}
           <div className="border-t border-gray-200 pt-6">
@@ -178,40 +209,6 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
                 </p>
               </div>
             </div>
-
-            {/* Vehicle Information for Approved Bookings */}
-            {booking.status === 'approved' && (booking.driver || booking.vehicle || booking.driverName) && (
-              <div className="mt-6 border-t border-gray-200 pt-6">
-                <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <Car className="h-4 w-4" />
-                  Maklumat Kenderaan
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Nama Pemandu:</label>
-                      <p className="text-sm text-gray-800">{booking.driverName || booking.driver?.name || '-'}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">No. Kenderaan:</label>
-                      <p className="text-sm text-gray-800">
-                        {booking.vehicleModel || booking.vehicle?.model || '-'}
-                        {(booking.vehiclePlateNumber || booking.vehicle?.plateNumber) && 
-                          ` - ${booking.vehiclePlateNumber || booking.vehicle?.plateNumber}`}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {booking.driverInstruction && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Arahan Kepada Pemandu:</label>
-                        <p className="text-sm text-gray-800">{booking.driverInstruction}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Rejection Reason (if rejected) */}
             {booking.status === 'rejected' && booking.rejectionReason && (
