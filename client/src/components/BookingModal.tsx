@@ -14,6 +14,17 @@ interface BookingModalProps {
 export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
   if (!booking) return null;
 
+  // Temporary debug to see what data the modal is receiving
+  if (booking.bookingId === '25010') {
+    console.log('MODAL DATA FOR 25010:', {
+      bookingId: booking.bookingId,
+      submissionDate: booking.submissionDate,
+      processedDate: booking.processedDate,
+      modifiedDate: booking.modifiedDate,
+      fullBooking: booking
+    });
+  }
+
   const getStatusBadge = (status: string) => {
     const variants = {
       pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -44,6 +55,18 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
         : new Date(); // For pending bookings, use current date
 
     const workingDays = calculateWorkingDays(submissionDate, endDate);
+    
+    // Debug for booking 25010
+    if (booking.bookingId === '25010') {
+      console.log('MODAL CALCULATION FOR 25010:', {
+        submissionDate: submissionDate.toISOString(),
+        processedDate: booking.processedDate,
+        modifiedDate: booking.modifiedDate,
+        endDate: endDate.toISOString(),
+        workingDays,
+        isOverdue: workingDays > 3
+      });
+    }
     
     return {
       days: workingDays,
