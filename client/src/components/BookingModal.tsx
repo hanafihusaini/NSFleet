@@ -36,14 +36,22 @@ export function BookingModal({ booking, isOpen, onClose }: BookingModalProps) {
 
   const calculateProcessingTime = () => {
     const submissionDate = new Date(booking.submissionDate);
-    // Use processedDate first, then modifiedDate, then current date for consistency with Applications page
+    // Use processedDate first (for consistency with Applications page), then modifiedDate, then current date
     const endDate = booking.processedDate 
       ? new Date(booking.processedDate)
       : booking.modifiedDate 
         ? new Date(booking.modifiedDate)
         : new Date(); // For pending bookings, use current date
 
+    // Debug logging
+    console.log('BookingModal Debug - Booking ID:', booking.bookingId);
+    console.log('Submission Date:', submissionDate);
+    console.log('Processed Date:', booking.processedDate);
+    console.log('Modified Date:', booking.modifiedDate);
+    console.log('Using End Date:', endDate);
+
     const workingDays = calculateWorkingDays(submissionDate, endDate);
+    console.log('Calculated Working Days:', workingDays);
     
     return {
       days: workingDays,
