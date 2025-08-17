@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -142,6 +142,9 @@ export function ProcessBookingModal({ booking, isOpen, onClose, onSuccess }: Pro
               <AlertTriangle className="h-5 w-5 text-orange-500" />
               Akses Terhad
             </DialogTitle>
+            <DialogDescription>
+              Akses tidak dibenarkan untuk mengubah permohonan ini
+            </DialogDescription>
           </DialogHeader>
           <div className="p-4">
             <p className="text-gray-600">
@@ -163,6 +166,9 @@ export function ProcessBookingModal({ booking, isOpen, onClose, onSuccess }: Pro
           <DialogTitle>
             {isModifying ? 'Ubah Permohonan' : 'Proses Permohonan'}: {booking.bookingId}
           </DialogTitle>
+          <DialogDescription>
+            {isModifying ? 'Ubah maklumat permohonan kenderaan yang telah diproses' : 'Luluskan atau tolak permohonan kenderaan'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

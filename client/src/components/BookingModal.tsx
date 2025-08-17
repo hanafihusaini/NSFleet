@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -71,6 +71,9 @@ export function BookingModal({ booking, isOpen, onClose, onProcessBooking }: Boo
             <FileText className="h-5 w-5" />
             Butiran Permohonan: {booking.bookingId}
           </DialogTitle>
+          <DialogDescription>
+            Butiran lengkap permohonan kenderaan untuk {booking.purpose}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

@@ -37,7 +37,7 @@ export function Layout({ children, title }: LayoutProps) {
   const mainNavItems = [
     { 
       path: user?.role === 'user' ? '/booking' : '/applications', 
-      label: user?.role === 'user' ? 'Permohonan' : 'Aplikasi', 
+      label: user?.role === 'user' ? 'Permohonan' : 'Tempahan', 
       icon: FileText,
       roles: ['user', 'admin', 'superadmin']
     },
@@ -109,7 +109,7 @@ export function Layout({ children, title }: LayoutProps) {
               <div className="flex-shrink-0 flex items-center">
                 <Car className="text-white text-2xl mr-3" />
                 <span className="text-white text-lg font-semibold">
-                  Sistem Tempahan Kenderaan
+                  NSFleet
                 </span>
               </div>
               <div className="hidden md:ml-6 md:flex md:space-x-8">
@@ -213,7 +213,7 @@ export function Layout({ children, title }: LayoutProps) {
               © 2025 Jabatan Akauntan Negara Malaysia, Negeri Sembilan. Hak Cipta Terpelihara.
             </div>
             <div className="text-sm text-gray-500">
-              Sistem Tempahan Kenderaan v2.1.0
+              NSFleet v2.1.0
             </div>
           </div>
         </div>
