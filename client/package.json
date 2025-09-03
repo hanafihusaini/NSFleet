@@ -1,4 +1,12 @@
 {
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  }
+}
+
+{
   "name": "nsfleet-client",
   "version": "1.0.0",
   "scripts": {
